@@ -1,0 +1,21 @@
+import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { ServicesComponent } from './pages/services/services.component';
+import { ContactComponent } from './pages/contact/contact.component';
+import { LoginComponent } from './pages/admin/login/login.component';
+import { DashboardComponent } from './pages/admin/dashboard/dashboard.component';
+import { AboutComponent } from './pages/about/about.component';
+import { LegalComponent } from './pages/legal/legal.component';
+import { ContentManagerComponent } from './pages/admin/content/content-manager.component';
+
+export const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 'services', component: ServicesComponent },
+  { path: 'about', component: AboutComponent },
+  { path: 'contact', component: ContactComponent },
+  { path: 'legal', component: LegalComponent },
+  { path: 'admin/login', component: LoginComponent },
+  { path: 'admin/dashboard', component: DashboardComponent },
+  { path: 'admin/content', component: ContentManagerComponent },
+  { path: '**', redirectTo: '' }
+];
