@@ -21,3 +21,18 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
     next();
   });
 };
+
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  // Check if user role is admin. 
+  // Adjust 'role' based on what your JWT payload structure is. 
+  // The seed says: role: 'admin'
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  
+  next();
+};

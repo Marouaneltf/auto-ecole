@@ -7,6 +7,10 @@ import { DashboardComponent } from './pages/admin/dashboard/dashboard.component'
 import { AboutComponent } from './pages/about/about.component';
 import { LegalComponent } from './pages/legal/legal.component';
 import { ContentManagerComponent } from './pages/admin/content/content-manager.component';
+import { MediaLibraryComponent } from './pages/admin/media-library/media-library.component';
+import { CmsPagesComponent } from './pages/admin/cms-pages/cms-pages.component';
+import { CmsBuilderComponent } from './pages/admin/cms-builder/cms-builder.component';
+import { DynamicPageComponent } from './pages/cms/dynamic-page.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -17,5 +21,9 @@ export const routes: Routes = [
   { path: 'admin/login', component: LoginComponent },
   { path: 'admin/dashboard', component: DashboardComponent },
   { path: 'admin/content', component: ContentManagerComponent },
+  { path: 'admin/media', component: MediaLibraryComponent },
+  { path: 'admin/pages', component: CmsPagesComponent },
+  { path: 'admin/cms-builder/:id', component: CmsBuilderComponent },
+  { path: 'page/:slug', component: DynamicPageComponent },
   { path: '**', redirectTo: '' }
 ];

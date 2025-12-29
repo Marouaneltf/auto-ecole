@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -36,7 +36,8 @@ import { ServiceDialogComponent } from '../../../components/service-dialog/servi
     MatSnackBarModule,
     MatTableModule,
     MatDialogModule,
-    MatSelectModule
+    MatSelectModule,
+    RouterLink
   ],
   template: `
     <div class="dashboard-container">
@@ -149,6 +150,47 @@ import { ServiceDialogComponent } from '../../../components/service-dialog/servi
               </mat-card>
             </div>
           </mat-tab>
+          <mat-tab label="CMS">
+            <div class="tab-content">
+              <div class="cms-grid">
+                <mat-card class="cms-card">
+                  <mat-card-header>
+                    <mat-card-title>Pages CMS</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <p>Créer, publier et gérer les pages du site.</p>
+                  </mat-card-content>
+                  <mat-card-actions>
+                    <a mat-raised-button color="primary" routerLink="/admin/pages">Gérer les pages</a>
+                  </mat-card-actions>
+                </mat-card>
+
+                <mat-card class="cms-card">
+                  <mat-card-header>
+                    <mat-card-title>Médiathèque</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <p>Uploader et sélectionner des images pour les composants.</p>
+                  </mat-card-content>
+                  <mat-card-actions>
+                    <a mat-raised-button color="primary" routerLink="/admin/media">Ouvrir la médiathèque</a>
+                  </mat-card-actions>
+                </mat-card>
+
+                <mat-card class="cms-card">
+                  <mat-card-header>
+                    <mat-card-title>Contenu hérité</mat-card-title>
+                  </mat-card-header>
+                  <mat-card-content>
+                    <p>Gérer les sections de contenu existantes.</p>
+                  </mat-card-content>
+                  <mat-card-actions>
+                    <a mat-raised-button color="primary" routerLink="/admin/content">Gérer le contenu</a>
+                  </mat-card-actions>
+                </mat-card>
+              </div>
+            </div>
+          </mat-tab>
         </mat-tab-group>
       </div>
     </div>
@@ -190,6 +232,14 @@ import { ServiceDialogComponent } from '../../../components/service-dialog/servi
     }
     .full-width-table {
       width: 100%;
+    }
+    .cms-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .cms-card {
+      min-height: 160px;
     }
   `]
 })
