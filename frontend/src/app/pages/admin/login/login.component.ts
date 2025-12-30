@@ -4,10 +4,9 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-input.component';
 
 @Component({
   selector: 'app-login',
@@ -16,10 +15,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AdminInputComponent
   ],
   template: `
     <div class="login-container">
@@ -30,18 +28,22 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
         </mat-card-header>
         <mat-card-content>
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email" type="email" placeholder="admin@exemple.com">
-              <mat-error *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis</mat-error>
-              <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Email invalide</mat-error>
-            </mat-form-field>
+            <div class="stack">
+              <app-admin-input
+                label="Email"
+                type="email"
+                placeholder="admin@exemple.com"
+                autocomplete="username"
+                formControlName="email"
+              ></app-admin-input>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Mot de passe</mat-label>
-              <input matInput formControlName="password" type="password">
-              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Le mot de passe est requis</mat-error>
-            </mat-form-field>
+              <app-admin-input
+                label="Mot de passe"
+                type="password"
+                autocomplete="current-password"
+                formControlName="password"
+              ></app-admin-input>
+            </div>
 
             <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading" class="full-width">
               {{ isLoading ? 'Connexion...' : 'Se connecter' }}
@@ -69,6 +71,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
       width: 100%;
       margin-bottom: 15px;
     }
+    .stack { display: grid; gap: 12px; margin-bottom: 15px; }
     mat-card-header {
       margin-bottom: 20px;
       justify-content: center;

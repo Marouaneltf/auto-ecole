@@ -5,11 +5,9 @@ import { ApiService } from '../../../services/api.service';
 import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-input.component';
 
 @Component({
   selector: 'app-content-manager',
@@ -19,11 +17,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     ReactiveFormsModule,
     MatCardModule,
     MatTableModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    AdminInputComponent
   ],
   template: `
     <div class="container">
@@ -34,31 +30,21 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
         <mat-card-content>
           <form [formGroup]="contentForm" (ngSubmit)="save()">
             <div class="grid">
-              <mat-form-field appearance="outline">
-                <mat-label>Page</mat-label>
-                <input matInput formControlName="page_name" placeholder="ex: home, about, footer">
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Section</mat-label>
-                <input matInput formControlName="section_name" placeholder="ex: hero_tagline">
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Type</mat-label>
-                <mat-select formControlName="content_type">
-                  <mat-option value="text">text</mat-option>
-                  <mat-option value="html">html</mat-option>
-                  <mat-option value="json">json</mat-option>
-                </mat-select>
-              </mat-form-field>
+              <app-admin-input label="Page" placeholder="ex: home, about, footer" formControlName="page_name"></app-admin-input>
+              <app-admin-input label="Section" placeholder="ex: hero_tagline" formControlName="section_name"></app-admin-input>
+              <app-admin-input label="Type" kind="select" formControlName="content_type">
+                <option value="text">text</option>
+                <option value="html">html</option>
+                <option value="json">json</option>
+                <option value="media">media</option>
+              </app-admin-input>
             </div>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Contenu</mat-label>
-              <textarea matInput formControlName="content" rows="4"></textarea>
-            </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Métadonnées (JSON)</mat-label>
-              <textarea matInput formControlName="metadata" rows="3" placeholder='{"key":"value"}'></textarea>
-            </mat-form-field>
+            <div class="full-width">
+              <app-admin-input label="Contenu" kind="textarea" [rows]="4" formControlName="content"></app-admin-input>
+            </div>
+            <div class="full-width">
+              <app-admin-input label="Métadonnées (JSON)" kind="textarea" [rows]="3" placeholder='{"key":"value"}' formControlName="metadata"></app-admin-input>
+            </div>
             <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">
               {{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}
             </button>
@@ -212,4 +198,3 @@ export class ContentManagerComponent implements OnInit {
     this.contentForm.reset({ page_name: '', section_name: '', content_type: 'text', content: '', metadata: '' });
   }
 }
-

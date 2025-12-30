@@ -28,6 +28,10 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/services/categories`);
   }
 
+  createCategory(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/services/categories`, data);
+  }
+
   getServicesByCategory(slug: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/services/category/${slug}`);
   }
@@ -70,5 +74,26 @@ export class ApiService {
 
   deleteContent(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/content/${id}`);
+  }
+
+  // Media
+  listMedia(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/media`);
+  }
+
+  uploadMedia(formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/media`, formData);
+  }
+
+  deleteMedia(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/media/${id}`);
+  }
+
+  resolveMediaUrl(item: any): string {
+    const base = this.apiUrl.replace(/\/?api$/, '');
+    const url = item?.url || '';
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 }

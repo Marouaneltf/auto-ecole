@@ -78,11 +78,21 @@ export class FooterComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getBusinessInfo().subscribe({
-      next: (data) => this.businessInfo = data,
+      next: (data) => {
+        this.businessInfo = data;
+        const hours = (data as any)?.opening_hours;
+        if (hours) {
+          this.hoursText = hours;
+        }
+      },
       error: (err) => console.error('Error fetching business info:', err)
     });
     this.apiService.getContent('footer','hours').subscribe({
-      next: (item) => this.hoursText = item?.content || '',
+      next: (item) => {
+        if (!this.hoursText) {
+          this.hoursText = item?.content || '';
+        }
+      },
       error: () => {}
     });
   }

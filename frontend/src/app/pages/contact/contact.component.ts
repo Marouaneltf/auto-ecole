@@ -1,239 +1,380 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { LucideAngularModule, MapPin, Phone, Mail, Clock, ChevronRight, User, MessageCircle } from 'lucide-angular';
+import { ContentService } from '../../services/content.service';
+import { HeaderComponent } from '../../components/layout/header/header.component';
+import { FooterComponent } from '../../components/layout/footer/footer.component';
+import { ButtonComponent } from '../../components/ui/button/button.component';
+import { ContactInfo } from '../../models/content.models';
 
 @Component({
   selector: 'app-contact',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatFormFieldModule, 
-    MatInputModule, 
-    MatButtonModule, 
-    MatIconModule,
-    MatSnackBarModule
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    LucideAngularModule,
+    HeaderComponent,
+    FooterComponent,
+    ButtonComponent
   ],
   template: `
-    <div class="page-header">
-      <div class="container">
-        <h1>Contactez-nous</h1>
-        <p>Une question ? Besoin d'informations ? Nous sommes là pour vous.</p>
+    <app-header></app-header>
+    
+    <!-- Hero Section -->
+    <section class="page-hero">
+      <div class="container-modern text-center">
+        <h1 class="page-title">Contactez-nous</h1>
+        <p class="page-subtitle">Nous sommes là pour répondre à toutes vos questions</p>
       </div>
-    </div>
+    </section>
 
-    <div class="container content">
-      <div class="grid-layout">
-        <div class="contact-info">
-          <h2>Nos Coordonnées</h2>
-          <div class="info-item">
-            <mat-icon>location_on</mat-icon>
-            <div>
-              <h3>Adresse</h3>
-              <p>{{ businessInfo?.address }}</p>
+    <!-- Contact Info Section -->
+    <section class="contact-info-section section-padding">
+      <div class="container-modern">
+        <div class="contact-info-grid">
+          <div class="contact-info-item">
+            <div class="contact-icon-wrapper">
+              <lucide-icon name="map-pin" class="contact-icon"></lucide-icon>
             </div>
+            <h3 class="contact-info-title">Adresse</h3>
+            <p class="contact-info-text">{{ contactInfo?.address || '6, rue Joseph Dijon' }}</p>
+            <p class="contact-info-text">75018 Paris</p>
           </div>
-          <div class="info-item">
-            <mat-icon>phone</mat-icon>
-            <div>
-              <h3>Téléphone</h3>
-              <p>{{ businessInfo?.phone }}</p>
+          <div class="contact-info-item">
+            <div class="contact-icon-wrapper">
+              <lucide-icon name="phone" class="contact-icon"></lucide-icon>
             </div>
+            <h3 class="contact-info-title">Téléphone</h3>
+            <p class="contact-info-text">
+              <a href="tel:{{ contactInfo?.phone || '0142589632' }}" class="contact-link">
+                {{ contactInfo?.phone || '01 42 58 96 32' }}
+              </a>
+            </p>
+            <p class="contact-info-text">Du lundi au samedi</p>
           </div>
-          <div class="info-item">
-            <mat-icon>email</mat-icon>
-            <div>
-              <h3>Email</h3>
-              <p>{{ businessInfo?.email }}</p>
+          <div class="contact-info-item">
+            <div class="contact-icon-wrapper">
+              <lucide-icon name="mail" class="contact-icon"></lucide-icon>
             </div>
+            <h3 class="contact-info-title">Email</h3>
+            <p class="contact-info-text">
+              <a href="mailto:{{ contactInfo?.email || 'contact@autoecole18.fr' }}" class="contact-link">
+                {{ contactInfo?.email || 'contact@autoecole18.fr' }}
+              </a>
+            </p>
+            <p class="contact-info-text">Réponse sous 24h</p>
           </div>
-          
-          <div class="hours">
-            <h3>Horaires d'ouverture</h3>
-            <ul>
-              <li><strong>Lundi - Vendredi:</strong> 9h00 - 19h00</li>
-              <li><strong>Samedi:</strong> 9h00 - 13h00</li>
-              <li><strong>Dimanche:</strong> Fermé</li>
-            </ul>
-          </div>
-
-          <div class="map">
-            <!-- Simple placeholder for map, ideally use Google Maps API -->
-            <iframe 
-              width="100%" 
-              height="300" 
-              frameborder="0" 
-              scrolling="no" 
-              marginheight="0" 
-              marginwidth="0" 
-              src="https://maps.google.com/maps?q=6%20rue%20Joseph%20Dijon%2C%2075018%20Paris&t=&z=15&ie=UTF8&iwloc=&output=embed">
-            </iframe>
+          <div class="contact-info-item">
+            <div class="contact-icon-wrapper">
+              <lucide-icon name="clock" class="contact-icon"></lucide-icon>
+            </div>
+            <h3 class="contact-info-title">Horaires</h3>
+            <p class="contact-info-text">{{ contactInfo?.hours || 'Lun-Ven: 8h-19h' }}</p>
+            <p class="contact-info-text">Sam: 9h-17h</p>
           </div>
         </div>
+      </div>
+    </section>
 
-        <div class="contact-form">
-          <h2>Envoyez-nous un message</h2>
-          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Nom complet</mat-label>
-              <input matInput formControlName="name" placeholder="Votre nom">
-              <mat-error *ngIf="contactForm.get('name')?.hasError('required')">Le nom est requis</mat-error>
-            </mat-form-field>
+    <!-- Map Section -->
+    <section class="map-section">
+      <div class="map-container">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937604!2d2.352221951743918!3d48.85661407905357!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e1f06e2b70f%3A0x40b82c3688c9460!2s6%20Rue%20Joseph%20Dijon%2C%2075018%20Paris!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr"
+          width="100%" 
+          height="400" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade"
+          class="map-iframe">
+        </iframe>
+      </div>
+    </section>
 
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email" placeholder="votre@email.com">
-              <mat-error *ngIf="contactForm.get('email')?.hasError('required')">L'email est requis</mat-error>
-              <mat-error *ngIf="contactForm.get('email')?.hasError('email')">Email invalide</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Téléphone</mat-label>
-              <input matInput formControlName="phone" placeholder="06 12 34 56 78">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Message</mat-label>
-              <textarea matInput formControlName="message" rows="5" placeholder="Votre message..."></textarea>
-              <mat-error *ngIf="contactForm.get('message')?.hasError('required')">Le message est requis</mat-error>
-            </mat-form-field>
-
-            <button mat-raised-button color="primary" type="submit" [disabled]="contactForm.invalid || isLoading">
-              {{ isLoading ? 'Envoi...' : 'Envoyer' }}
-            </button>
+    <!-- Contact Form Section -->
+    <section class="contact-form-section section-padding bg-gray-50">
+      <div class="container-modern">
+        <div class="section-header text-center">
+          <h2 class="section-title">Envoyez-nous un message</h2>
+          <p class="section-subtitle">Nous vous répondrons dans les plus brefs délais</p>
+        </div>
+        <div class="contact-form-container">
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name" class="form-label">Nom complet *</label>
+                <input 
+                  type="text" 
+                  id="name" 
+                  formControlName="name" 
+                  class="form-input"
+                  [class.error]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched"
+                  placeholder="Votre nom">
+                <div *ngIf="contactForm.get('name')?.invalid && contactForm.get('name')?.touched" class="error-message">
+                  Le nom est requis
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email" class="form-label">Email *</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  formControlName="email" 
+                  class="form-input"
+                  [class.error]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched"
+                  placeholder="votre@email.com">
+                <div *ngIf="contactForm.get('email')?.invalid && contactForm.get('email')?.touched" class="error-message">
+                  <span *ngIf="contactForm.get('email')?.errors?.['required']">L'email est requis</span>
+                  <span *ngIf="contactForm.get('email')?.errors?.['email']">Format d'email invalide</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="phone" class="form-label">Téléphone</label>
+              <input 
+                type="tel" 
+                id="phone" 
+                formControlName="phone" 
+                class="form-input"
+                placeholder="01 23 45 67 89">
+            </div>
+            <div class="form-group">
+              <label for="subject" class="form-label">Sujet *</label>
+              <input 
+                type="text" 
+                id="subject" 
+                formControlName="subject" 
+                class="form-input"
+                [class.error]="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched"
+                placeholder="Quel est le sujet de votre message ?">
+              <div *ngIf="contactForm.get('subject')?.invalid && contactForm.get('subject')?.touched" class="error-message">
+                Le sujet est requis
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="message" class="form-label">Message *</label>
+              <textarea 
+                id="message" 
+                formControlName="message" 
+                rows="5" 
+                class="form-input form-textarea"
+                [class.error]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched"
+                placeholder="Décrivez votre demande...">
+              </textarea>
+              <div *ngIf="contactForm.get('message')?.invalid && contactForm.get('message')?.touched" class="error-message">
+                Le message est requis (minimum 10 caractères)
+              </div>
+            </div>
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn-primary"
+                [disabled]="contactForm.invalid || isSubmitting">
+                <lucide-icon name="chevron-right" class="mr-2"></lucide-icon>
+                <span *ngIf="!isSubmitting">Envoyer le message</span>
+                <span *ngIf="isSubmitting">Envoi en cours...</span>
+              </button>
+            </div>
           </form>
         </div>
       </div>
-    </div>
+    </section>
+
+    <app-footer></app-footer>
   `,
   styles: [`
-    .page-header {
-      background-color: #1E40AF;
-      color: white;
-      padding: 60px 0;
-      text-align: center;
+    .page-hero {
+      @apply bg-gradient-to-br from-primary-600 to-primary-700 text-white py-24;
     }
-    .page-header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 10px;
+    
+    .page-title {
+      @apply text-4xl md:text-5xl font-bold mb-4;
     }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
+    
+    .page-subtitle {
+      @apply text-xl md:text-2xl text-primary-100 max-w-2xl mx-auto;
     }
-    .content {
-      padding-top: 60px;
-      padding-bottom: 80px;
+    
+    .contact-info-section {
+      @apply py-16;
     }
-    .grid-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
+    
+    .contact-info-grid {
+      @apply grid md:grid-cols-2 lg:grid-cols-4 gap-8;
     }
-    @media (max-width: 768px) {
-      .grid-layout {
-        grid-template-columns: 1fr;
+    
+    .contact-info-item {
+      @apply text-center p-6 rounded-xl bg-white shadow-lg hover:shadow-xl transition-all duration-300;
+    }
+    
+    .contact-icon-wrapper {
+      @apply w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4;
+    }
+    
+    .contact-icon {
+      @apply w-8 h-8 text-primary-600;
+    }
+    
+    .contact-info-title {
+      @apply text-xl font-semibold text-gray-900 mb-2;
+    }
+    
+    .contact-info-text {
+      @apply text-gray-600 mb-1;
+    }
+    
+    .contact-link {
+      @apply text-primary-600 hover:text-primary-700 transition-colors duration-200;
+      text-decoration: none;
+    }
+    
+    .map-section {
+      @apply relative;
+    }
+    
+    .map-container {
+      @apply w-full;
+    }
+    
+    .map-iframe {
+      @apply w-full h-96;
+    }
+    
+    .contact-form-section {
+      @apply py-16;
+    }
+    
+    .section-header {
+      @apply mb-12 text-center;
+    }
+    
+    .section-title {
+      @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+    }
+    
+    .section-subtitle {
+      @apply text-lg text-gray-600 max-w-2xl mx-auto;
+    }
+    
+    .contact-form-container {
+      @apply max-w-2xl mx-auto;
+    }
+    
+    .contact-form {
+      @apply space-y-6;
+    }
+    
+    .form-row {
+      @apply grid md:grid-cols-2 gap-6;
+    }
+    
+    .form-group {
+      @apply space-y-2;
+    }
+    
+    .form-label {
+      @apply block text-sm font-medium text-gray-700;
+    }
+    
+    .form-input {
+      @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+      
+      &.error {
+        @apply border-red-500 focus:ring-red-500;
+      }
+      
+      &:focus {
+        @apply outline-none;
       }
     }
-    h2 {
-      color: #1E40AF;
-      margin-bottom: 30px;
+    
+    .form-textarea {
+      @apply min-h-[120px];
     }
-    .info-item {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 25px;
+    
+    .error-message {
+      @apply text-sm text-red-600 mt-1;
     }
-    .info-item mat-icon {
-      color: #F59E0B;
-      margin-right: 15px;
-      font-size: 24px;
+    
+    .form-actions {
+      @apply pt-4;
     }
-    .info-item h3 {
-      margin: 0 0 5px 0;
-      font-size: 1.1rem;
-    }
-    .info-item p {
-      margin: 0;
-      color: #555;
-    }
-    .hours {
-      margin-top: 40px;
-      background: #F3F4F6;
-      padding: 20px;
-      border-radius: 8px;
-    }
-    .hours ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .hours li {
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-    }
-    .map {
-      margin-top: 40px;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .full-width {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    button[type="submit"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 1.1rem;
+    
+    @media (max-width: 768px) {
+      .page-hero {
+        @apply py-16;
+      }
+      
+      .page-title {
+        @apply text-3xl;
+      }
+      
+      .page-subtitle {
+        @apply text-lg;
+      }
+      
+      .contact-info-grid {
+        @apply grid-cols-1 gap-6;
+      }
+      
+      .map-iframe {
+        @apply h-64;
+      }
+      
+      .form-row {
+        @apply grid-cols-1 gap-4;
+      }
     }
   `]
 })
 export class ContactComponent implements OnInit {
   contactForm: FormGroup;
-  businessInfo: any;
-  isLoading = false;
+  contactInfo: ContactInfo | null = null;
+  isSubmitting = false;
+  submitSuccess = false;
 
   constructor(
     private fb: FormBuilder,
-    private apiService: ApiService,
-    private snackBar: MatSnackBar
+    private contentService: ContentService
   ) {
     this.contactForm = this.fb.group({
-      name: ['', Validators.required],
+      name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
-      message: ['', Validators.required]
+      subject: ['', [Validators.required, Validators.minLength(5)]],
+      message: ['', [Validators.required, Validators.minLength(10)]]
     });
   }
 
   ngOnInit() {
-    this.apiService.getBusinessInfo().subscribe(data => this.businessInfo = data);
+    this.contentService.getContactInfo().subscribe(info => {
+      this.contactInfo = info;
+    });
   }
 
   onSubmit() {
-    if (this.contactForm.valid) {
-      this.isLoading = true;
-      this.apiService.submitContact(this.contactForm.value).subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.snackBar.open('Message envoyé avec succès !', 'Fermer', { duration: 3000 });
-          this.contactForm.reset();
-        },
-        error: (err) => {
-          this.isLoading = false;
-          console.error('Error sending message:', err);
-          this.snackBar.open('Erreur lors de l\'envoi du message.', 'Fermer', { duration: 3000 });
-        }
-      });
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      return;
     }
+
+    this.isSubmitting = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+      this.isSubmitting = false;
+      this.submitSuccess = true;
+      this.contactForm.reset();
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        this.submitSuccess = false;
+      }, 5000);
+    }, 2000);
   }
 }

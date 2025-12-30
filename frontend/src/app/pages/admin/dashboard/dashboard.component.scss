@@ -1,0 +1,6 @@
+:host { display: block; }
+.overview { padding: 24px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.card { background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 6px; display: block; color: #111827; text-decoration: none; }
+.card h3 { margin: 0 0 6px 0; color: #1E40AF; }
+.card p { margin: 0; color: #555; }

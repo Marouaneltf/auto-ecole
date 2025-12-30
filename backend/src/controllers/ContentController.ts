@@ -19,7 +19,7 @@ export const getContentByPageSection = async (req: Request, res: Response) => {
     const { page, section } = req.params;
     const item = await Content.findOne({ where: { page_name: page, section_name: section } });
     if (!item) {
-      return res.status(404).json({ message: 'Content not found' });
+      return res.status(200).json(null);
     }
     res.json(item);
   } catch (error) {
@@ -59,4 +59,3 @@ export const deleteContent = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error deleting content', error });
   }
 };
-

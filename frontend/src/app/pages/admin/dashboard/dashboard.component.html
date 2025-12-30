@@ -1,1 +1,46 @@
-<p>dashboard works!</p>
+<section class="overview">
+  <h2>Tableau de bord</h2>
+  <p>Choisissez une section à gérer. Une tâche par écran.</p>
+  <div class="grid">
+    <a class="card" [routerLink]="['/admin/services']">
+      <h3>Services / Offres</h3>
+      <p>Liste et édition des services.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/home']">
+      <h3>Home Page Content</h3>
+      <p>Titres, blocs, images de l'accueil.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/contact']">
+      <h3>Contact</h3>
+      <p>Adresse, téléphone, email.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/media']">
+      <h3>Médiathèque</h3>
+      <p>Téléverser et gérer les images.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/header']">
+      <h3>En-tête</h3>
+      <p>Logo, nom, navigation.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/footer']">
+      <h3>Pied de page</h3>
+      <p>Coordonnées et horaires.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/about']">
+      <h3>À propos</h3>
+      <p>Texte et image de présentation.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/ui']">
+      <h3>UI & Branding</h3>
+      <p>Couleurs et identité visuelle.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/dashboard','home-hero']">
+      <h3>Accueil — Hero</h3>
+      <p>Titre, sous-titre, image de fond.</p>
+    </a>
+    <a class="card" [routerLink]="['/admin/dashboard','home-services']">
+      <h3>Accueil — Services</h3>
+      <p>Intro et CTA.</p>
+    </a>
+  </div>
+</section>
