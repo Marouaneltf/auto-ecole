@@ -25,8 +25,6 @@ import {
   AlertCircle
 } from 'lucide-angular';
 import { ContentService } from '../../services/content.service';
-import { HeaderComponent } from '../../components/layout/header/header.component';
-import { FooterComponent } from '../../components/layout/footer/footer.component';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { CardComponent } from '../../components/ui/card/card.component';
 import { ServiceCardComponent } from '../../components/shared/service-card/service-card.component';
@@ -47,8 +45,6 @@ import {
     CommonModule,
     RouterModule,
     LucideAngularModule,
-    HeaderComponent,
-    FooterComponent,
     ButtonComponent,
     CardComponent,
     ServiceCardComponent,
@@ -56,8 +52,6 @@ import {
     ContactFormComponent
   ],
   template: `
-    <app-header></app-header>
-    
     <!-- Hero Section -->
     <section class="hero relative min-h-screen flex items-center justify-center overflow-hidden">
       <div class="hero-background absolute inset-0 z-0">
@@ -371,7 +365,6 @@ import {
       </div>
     </section>
 
-    <app-footer></app-footer>
   `,
   styles: [`
     .hero {

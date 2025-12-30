@@ -5,6 +5,10 @@
 // Custom base styles
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --primary: #1E40AF;
+  --accent: #F59E0B;
+}
 * {
   box-sizing: border-box;
 }
@@ -25,11 +29,36 @@ body {
 // Custom component styles
 @layer components {
   .btn-primary {
-    @apply bg-accent-500 hover:bg-accent-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+    color: #fff;
+      background-color: var(--accent);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      transition: all 300ms;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    
+      &:hover {
+        filter: brightness(0.95);
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+      }
   }
 
   .btn-secondary {
-    @apply bg-white hover:bg-gray-50 text-primary-600 font-semibold py-3 px-6 rounded-lg border-2 border-primary-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+    background-color: #fff;
+      color: var(--primary);
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      border: 2px solid var(--primary);
+      transition: all 300ms;
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+    
+      &:hover {
+        background-color: #f9fafb;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
+      }
   }
 
   .card-modern {
@@ -67,6 +96,85 @@ body {
 
 // Animations
 @layer utilities {
+  .text-primary-600 {
+      color: var(--primary) !important;
+    }
+  
+    .text-primary-700 {
+      color: var(--primary) !important;
+    }
+  
+    .text-primary-100 {
+      color: color-mix(in oklab, var(--primary) 20%, white 80%) !important;
+    }
+  
+    .bg-primary-500 {
+      background-color: var(--primary) !important;
+    }
+  
+    .bg-primary-600 {
+      background-color: var(--primary) !important;
+    }
+  
+    .bg-primary-100 {
+      background-color: color-mix(in oklab, var(--primary) 15%, white 85%) !important;
+    }
+  
+    .bg-primary-200 {
+      background-color: color-mix(in oklab, var(--primary) 25%, white 75%) !important;
+    }
+  
+    .from-primary-50 {
+      --tw-gradient-from: color-mix(in oklab, var(--primary) 10%, white 90%) !important;
+    }
+  
+    .from-primary-100 {
+      --tw-gradient-from: color-mix(in oklab, var(--primary) 15%, white 85%) !important;
+    }
+  
+    .from-primary-500 {
+      --tw-gradient-from: var(--primary) !important;
+    }
+  
+    .from-primary-600 {
+      --tw-gradient-from: var(--primary) !important;
+    }
+  
+    .to-primary-700 {
+      --tw-gradient-to: color-mix(in oklab, var(--primary) 85%, black 15%) !important;
+    }
+  
+    .via-primary-800 {
+      --tw-gradient-to: color-mix(in oklab, var(--primary) 90%, black 10%) !important;
+    }
+  
+    .from-accent-50 {
+      --tw-gradient-from: color-mix(in oklab, var(--accent) 10%, white 90%) !important;
+    }
+  
+    .to-accent-50 {
+      --tw-gradient-to: color-mix(in oklab, var(--accent) 10%, white 90%) !important;
+    }
+  
+    .text-accent-500 {
+      color: var(--accent) !important;
+    }
+  
+    .text-accent-600 {
+      color: var(--accent) !important;
+    }
+  
+    .bg-accent-500 {
+      background-color: var(--accent) !important;
+    }
+  
+    .bg-accent-600 {
+      background-color: var(--accent) !important;
+    }
+  
+    .to-accent-900 {
+      --tw-gradient-to: var(--accent) !important;
+    }
   .animate-fade-in {
     animation: fadeIn 0.6s ease-out;
   }

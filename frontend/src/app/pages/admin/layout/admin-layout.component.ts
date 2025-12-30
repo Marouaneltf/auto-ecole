@@ -20,6 +20,8 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
           <a [routerLink]="['/admin/footer']" routerLinkActive="active"><span>Pied de page</span></a>
           <a [routerLink]="['/admin/about']" routerLinkActive="active"><span>À propos</span></a>
           <a [routerLink]="['/admin/ui']" routerLinkActive="active"><span>UI & Branding</span></a>
+          <a [routerLink]="['/admin/dashboard', 'home-hero']" routerLinkActive="active"><span>Accueil — Hero</span></a>
+          <a [routerLink]="['/admin/dashboard', 'home-services']" routerLinkActive="active"><span>Accueil — Services</span></a>
         </nav>
       </aside>
       <main class="main">

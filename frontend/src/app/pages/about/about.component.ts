@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Award, Users, Car, Clock, CheckCircle, MapPin, Phone, Mail } from 'lucide-angular';
 import { ContentService } from '../../services/content.service';
-import { HeaderComponent } from '../../components/layout/header/header.component';
-import { FooterComponent } from '../../components/layout/footer/footer.component';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { AboutContent } from '../../models/content.models';
 
@@ -15,13 +13,9 @@ import { AboutContent } from '../../models/content.models';
     CommonModule,
     RouterModule,
     LucideAngularModule,
-    HeaderComponent,
-    FooterComponent,
     ButtonComponent
   ],
   template: `
-    <app-header></app-header>
-    
     <!-- Hero Section -->
     <section class="page-hero">
       <div class="container-modern text-center">
@@ -177,7 +171,6 @@ import { AboutContent } from '../../models/content.models';
       </div>
     </section>
 
-    <app-footer></app-footer>
   `,
   styles: [`
     .page-hero {

@@ -4,8 +4,6 @@ import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { LucideAngularModule, MapPin, Phone, Mail, Clock, ChevronRight, User, MessageCircle } from 'lucide-angular';
 import { ContentService } from '../../services/content.service';
-import { HeaderComponent } from '../../components/layout/header/header.component';
-import { FooterComponent } from '../../components/layout/footer/footer.component';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { ContactInfo } from '../../models/content.models';
 
@@ -17,13 +15,9 @@ import { ContactInfo } from '../../models/content.models';
     RouterModule,
     ReactiveFormsModule,
     LucideAngularModule,
-    HeaderComponent,
-    FooterComponent,
     ButtonComponent
   ],
   template: `
-    <app-header></app-header>
-    
     <!-- Hero Section -->
     <section class="page-hero">
       <div class="container-modern text-center">
@@ -185,7 +179,6 @@ import { ContactInfo } from '../../models/content.models';
       </div>
     </section>
 
-    <app-footer></app-footer>
   `,
   styles: [`
     .page-hero {

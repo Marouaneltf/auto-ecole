@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Car, FileText, Award, Clock, Users, CheckCircle } from 'lucide-angular';
 import { ContentService } from '../../services/content.service';
-import { HeaderComponent } from '../../components/layout/header/header.component';
-import { FooterComponent } from '../../components/layout/footer/footer.component';
 import { ServiceCardComponent } from '../../components/shared/service-card/service-card.component';
 import { Service } from '../../models/content.models';
 
@@ -15,13 +13,9 @@ import { Service } from '../../models/content.models';
     CommonModule,
     RouterModule,
     LucideAngularModule,
-    HeaderComponent,
-    FooterComponent,
     ServiceCardComponent
   ],
   template: `
-    <app-header></app-header>
-    
     <!-- Hero Section -->
     <section class="page-hero">
       <div class="container-modern text-center">
@@ -134,7 +128,6 @@ import { Service } from '../../models/content.models';
       </div>
     </section>
 
-    <app-footer></app-footer>
   `,
   styles: [`
     .page-hero {
