@@ -20,7 +20,7 @@ export interface ContactFormData {
         <div class="form-group">
           <label for="name" class="form-label">
             <lucide-icon name="user" class="w-4 h-4 mr-2"></lucide-icon>
-            Nom complet
+            Nom
           </label>
           <input
             type="text"

@@ -30,35 +30,54 @@ body {
 @layer components {
   .btn-primary {
     color: #fff;
-      background-color: var(--accent);
+    background-color: var(--accent);
       font-weight: 600;
       padding: 0.75rem 1.5rem;
       border-radius: 0.5rem;
       transition: all 300ms;
       box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
     
-      &:hover {
-        filter: brightness(0.95);
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+    /* Layout fix */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    
+      lucide-icon,
+      svg {
+        margin: 0 !important;
       }
+                &:hover {
+                  filter: brightness(0.95);
+                  transform: translateY(-2px);
+                  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+                }
   }
 
   .btn-secondary {
     background-color: #fff;
-      color: var(--primary);
+    color: var(--primary);
       font-weight: 600;
       padding: 0.75rem 1.5rem;
       border-radius: 0.5rem;
       border: 2px solid var(--primary);
       transition: all 300ms;
       box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+    /* Layout fix */
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     
-      &:hover {
-        background-color: #f9fafb;
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
-      }
+      lucide-icon,
+        svg {
+          margin: 0 !important;
+        }
+                &:hover {
+                  background-color: #f9fafb;
+                  transform: translateY(-2px);
+                  box-shadow: 0 15px 25px rgba(0, 0, 0, 0.12);
+                }
   }
 
   .card-modern {

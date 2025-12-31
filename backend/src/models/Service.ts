@@ -12,6 +12,7 @@ class Service extends Model {
   public duration!: string;
   public is_active!: boolean;
   public icon!: string;
+  public image_media_id!: number | null;
   public sort_order!: number;
   public readonly created_at!: Date;
   public readonly updated_at!: Date;
@@ -57,6 +58,10 @@ Service.init(
     },
     icon: {
       type: DataTypes.STRING,
+    },
+    image_media_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
     },
     sort_order: {
       type: DataTypes.INTEGER,

@@ -32,6 +32,12 @@ export const routes: Routes = [
       { path: 'footer', loadComponent: () => import('./pages/admin/footer/admin-footer.component').then(m => m.AdminFooterComponent) },
       { path: 'about', loadComponent: () => import('./pages/admin/about/admin-about.component').then(m => m.AdminAboutComponent) },
       { path: 'home', loadComponent: () => import('./pages/admin/home-about/admin-home-about.component').then(m => m.AdminHomeAboutComponent) },
+      { path: 'home-hero', loadComponent: () => import('./pages/admin/home-hero/admin-home-hero.component').then(m => m.AdminHomeHeroComponent) },
+      { path: 'home-services', loadComponent: () => import('./pages/admin/home-services/admin-home-services.component').then(m => m.AdminHomeServicesComponent) },
+      { path: 'pages/home', loadComponent: () => import('./pages/admin/home-page/admin-home-page.component').then(m => m.AdminHomePageComponent) },
+      { path: 'pages/services', loadComponent: () => import('./pages/admin/services-page/admin-services-page.component').then(m => m.AdminServicesPageComponent) },
+      { path: 'pages/about', loadComponent: () => import('./pages/admin/about-page/admin-about-page.component').then(m => m.AdminAboutPageComponent) },
+      { path: 'pages/legal', loadComponent: () => import('./pages/admin/legal-page/admin-legal-page.component').then(m => m.AdminLegalPageComponent) },
       { path: 'contact', loadComponent: () => import('./pages/admin/contact-info/admin-contact-info.component').then(m => m.AdminContactInfoComponent) },
       { path: 'ui', loadComponent: () => import('./pages/admin/ui-settings/ui-settings.component').then(m => m.UiSettingsComponent) },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

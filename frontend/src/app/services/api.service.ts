@@ -81,6 +81,10 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/media`);
   }
 
+  getMediaById(id: number | string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/media/${id}`);
+  }
+
   uploadMedia(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/media`, formData);
   }

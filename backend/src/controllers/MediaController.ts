@@ -54,6 +54,28 @@ export const listMedia = async (_req: Request, res: Response) => {
   }
 };
 
+export const getMediaById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as any;
+    const m = await Media.findByPk(id);
+    if (!m) return res.status(404).json({ message: 'Media not found' });
+    res.json({
+      id: m.id,
+      filename: m.filename,
+      original_name: m.original_name,
+      mime_type: m.mime_type,
+      file_size: m.file_size,
+      path: m.path,
+      alt_text: m.alt_text,
+      created_at: m.created_at,
+      updated_at: m.updated_at,
+      url: `/uploads/${path.basename(m.path)}`,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching media', error });
+  }
+};
+
 export const uploadMedia = async (req: Request, res: Response) => {
   try {
     const file = (req as any).file as Express.Multer.File;
@@ -104,4 +126,3 @@ export const deleteMedia = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error deleting media', error });
   }
 };
-

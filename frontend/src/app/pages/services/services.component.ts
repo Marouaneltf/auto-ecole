@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Car, FileText, Award, Clock, Users, CheckCircle } from 'lucide-angular';
-import { ContentService } from '../../services/content.service';
+import { ApiService } from '../../services/api.service';
 import { ServiceCardComponent } from '../../components/shared/service-card/service-card.component';
-import { Service } from '../../models/content.models';
+import { Service as FrontService } from '../../models/content.models';
 
 @Component({
   selector: 'app-services',
@@ -19,8 +19,8 @@ import { Service } from '../../models/content.models';
     <!-- Hero Section -->
     <section class="page-hero">
       <div class="container-modern text-center">
-        <h1 class="page-title">Nos Formations</h1>
-        <p class="page-subtitle">Découvrez nos offres adaptées à vos besoins</p>
+        <h1 class="page-title" *ngIf="pageTitle">{{ pageTitle }}</h1>
+        <p class="page-subtitle" *ngIf="pageSubtitle">{{ pageSubtitle }}</p>
       </div>
     </section>
 
@@ -38,90 +38,55 @@ import { Service } from '../../models/content.models';
     </section>
 
     <!-- Features Section -->
-    <section class="features-section section-padding bg-gray-50">
+    <section class="features-section section-padding bg-gray-50" *ngIf="features?.length">
       <div class="container-modern">
         <div class="section-header text-center">
-          <h2 class="section-title">Pourquoi choisir notre auto-école ?</h2>
-          <p class="section-subtitle">Des milliers d'élèves nous font confiance</p>
+          <h2 class="section-title" *ngIf="featuresTitle">{{ featuresTitle }}</h2>
+          <p class="section-subtitle" *ngIf="featuresSubtitle">{{ featuresSubtitle }}</p>
         </div>
         <div class="features-grid">
-          <div class="feature-item">
+          <div class="feature-item" *ngFor="let f of features">
             <div class="feature-icon">
-              <lucide-icon name="award" class="w-8 h-8"></lucide-icon>
+              <lucide-icon [name]="f.icon" class="w-8 h-8"></lucide-icon>
             </div>
-            <h3 class="feature-title">Taux de réussite élevé</h3>
-            <p class="feature-description">95% de réussite grâce à notre méthode pédagogique éprouvée</p>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <lucide-icon name="users" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="feature-title">Instructeurs certifiés</h3>
-            <p class="feature-description">Des professionnels expérimentés et à l'écoute</p>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <lucide-icon name="clock" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="feature-title">Horaires flexibles</h3>
-            <p class="feature-description">Des créneaux adaptés à votre emploi du temps</p>
-          </div>
-          <div class="feature-item">
-            <div class="feature-icon">
-              <lucide-icon name="check-circle" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="feature-title">Formule tout inclus</h3>
-            <p class="feature-description">Code de la route, leçons de conduite et examen inclus</p>
+            <h3 class="feature-title">{{ f.title }}</h3>
+            <p class="feature-description">{{ f.description }}</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Vehicle Showcase -->
-    <section class="vehicles-section section-padding">
+    <section class="vehicles-section section-padding" *ngIf="vehicles?.length">
       <div class="container-modern">
         <div class="section-header text-center">
-          <h2 class="section-title">Nos véhicules</h2>
-          <p class="section-subtitle">Des véhicules modernes et bien entretenus</p>
+          <h2 class="section-title" *ngIf="vehiclesTitle">{{ vehiclesTitle }}</h2>
+          <p class="section-subtitle" *ngIf="vehiclesSubtitle">{{ vehiclesSubtitle }}</p>
         </div>
         <div class="vehicles-grid">
-          <div class="vehicle-item">
-            <div class="vehicle-image">
-              <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Voiture de formation" class="vehicle-img">
+          <div class="vehicle-item" *ngFor="let v of vehicles">
+            <div class="vehicle-image" *ngIf="v.image_url">
+              <img [src]="v.image_url" [alt]="v.title" class="vehicle-img">
             </div>
-            <h3 class="vehicle-title">Voitures</h3>
-            <p class="vehicle-description">Dernières générations avec double commande</p>
-          </div>
-          <div class="vehicle-item">
-            <div class="vehicle-image">
-              <img src="https://images.unsplash.com/photo-1558980664-3a031cf67ea8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Moto de formation" class="vehicle-img">
-            </div>
-            <h3 class="vehicle-title">Motos</h3>
-            <p class="vehicle-description">125cm³ et plus, équipement fourni</p>
-          </div>
-          <div class="vehicle-item">
-            <div class="vehicle-image">
-              <img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Scooter de formation" class="vehicle-img">
-            </div>
-            <h3 class="vehicle-title">Scooters</h3>
-            <p class="vehicle-description">Idéal pour la ville, facile à manœuvrer</p>
+            <h3 class="vehicle-title">{{ v.title }}</h3>
+            <p class="vehicle-description">{{ v.description }}</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section section-padding bg-primary-600">
+    <section class="cta-section section-padding bg-primary-600" *ngIf="ctaLabel || businessPhone">
       <div class="container-modern text-center">
-        <h2 class="cta-title">Prêt à commencer votre formation ?</h2>
-        <p class="cta-subtitle">Contactez-nous pour planifier votre premier cours</p>
+        <h2 class="cta-title" *ngIf="ctaTitle">{{ ctaTitle }}</h2>
+        <p class="cta-subtitle" *ngIf="ctaSubtitle">{{ ctaSubtitle }}</p>
         <div class="cta-actions">
-          <button class="btn-secondary">
+          <button class="btn-secondary" *ngIf="businessPhone">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
-            01 42 58 96 32
+            {{ businessPhone }}
           </button>
-          <button routerLink="/contact" class="btn-primary">
-            Prendre rendez-vous
+          <button routerLink="/contact" class="btn-primary" *ngIf="ctaLabel">
+            {{ ctaLabel }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
         </div>
@@ -262,13 +227,66 @@ import { Service } from '../../models/content.models';
   `]
 })
 export class ServicesComponent implements OnInit {
-  services: Service[] = [];
+  services: FrontService[] = [];
+  pageTitle = '';
+  pageSubtitle = '';
+  featuresTitle = '';
+  featuresSubtitle = '';
+  features: Array<{ icon: string; title: string; description: string }> = [];
+  vehiclesTitle = '';
+  vehiclesSubtitle = '';
+  vehicles: Array<{ title: string; description: string; image_url?: string }> = [];
+  ctaTitle = '';
+  ctaSubtitle = '';
+  ctaLabel = '';
+  businessPhone = '';
 
-  constructor(private contentService: ContentService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.contentService.getServices().subscribe(services => {
-      this.services = services;
+    this.api.getServices().subscribe({
+      next: (list) => {
+        this.services = (list || []).map((s: any) => ({
+          id: String(s.id ?? s.slug ?? ''),
+          title: String(s.name ?? ''),
+          description: String(s.description ?? ''),
+          category: 'permis-b',
+          icon: String(s.icon ?? 'car'),
+          features: [],
+          price: s.price ? `${s.price}€` : undefined,
+          duration: s.duration || undefined,
+          image_media_id: s.image_media_id ?? undefined,
+          image_url: s.image_url ?? undefined
+        }));
+      },
+      error: () => { console.warn('[services] cannot load services'); this.services = []; }
     });
+
+    this.api.getContent('services','page_title').subscribe({ next: (i) => this.pageTitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','page_subtitle').subscribe({ next: (i) => this.pageSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','features_title').subscribe({ next: (i) => this.featuresTitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','features_subtitle').subscribe({ next: (i) => this.featuresSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','features').subscribe({ next: (i) => { try { const arr = JSON.parse(i?.content || '[]'); this.features = Array.isArray(arr) ? arr : []; } catch { this.features = []; } }, error: () => {} });
+    this.api.getContent('services','vehicles_title').subscribe({ next: (i) => this.vehiclesTitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','vehicles_subtitle').subscribe({ next: (i) => this.vehiclesSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','vehicles').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        const list = Array.isArray(arr) ? arr : [];
+        this.vehicles = list.map((v: any) => ({ title: v.title, description: v.description, image_url: '' }));
+        list.forEach((v: any, idx: number) => {
+          const id = Number(v.image);
+          if (!isNaN(id) && id > 0) {
+            this.api.getMediaById(id).subscribe({ next: (m) => this.vehicles[idx].image_url = this.api.resolveMediaUrl(m), error: () => {} });
+          } else if (typeof v.image === 'string') {
+            this.vehicles[idx].image_url = this.api.resolveMediaUrl({ url: v.image });
+          }
+        });
+      } catch { this.vehicles = []; }
+    }, error: () => {} });
+    this.api.getContent('services','cta_title').subscribe({ next: (i) => this.ctaTitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','cta_subtitle').subscribe({ next: (i) => this.ctaSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('services','cta_label').subscribe({ next: (i) => this.ctaLabel = i?.content || '', error: () => {} });
+    this.api.getBusinessInfo().subscribe({ next: (info) => this.businessPhone = info?.phone || '', error: () => {} });
   }
 }

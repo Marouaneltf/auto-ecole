@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LucideAngularModule, Car, FileText, Award, Check } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
+import { ApiService } from '../../../services/api.service';
 
 export interface Service {
   id: string;
@@ -20,18 +21,18 @@ export interface Service {
   template: `
     <div class="service-card card-modern group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl">
       <div class="service-header relative overflow-hidden">
-        <div class="service-image-wrapper">
+        <div class="service-image-wrapper" *ngIf="imageUrl">
           <img 
-            [src]="'https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=Professional%20driving%20school%20' + service.category + '%20training%2C%20modern%20car%2C%20clean%20background%2C%20high%20quality%2C%20automotive%20photography&image_size=square'" 
+            [src]="imageUrl" 
             [alt]="service.title"
             class="service-image w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110">
           <div class="service-image-overlay"></div>
         </div>
         
-        <div class="service-category-badge absolute top-4 right-4">
+        <div class="service-category-badge absolute top-4 right-4" *ngIf="badgeLabel">
           <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-primary-700">
-            <lucide-icon [name]="getCategoryIcon()" class="w-3 h-3 mr-1"></lucide-icon>
-            {{ getCategoryLabel() }}
+            <lucide-icon [name]="badgeIcon" class="w-3 h-3 mr-1" *ngIf="badgeIcon"></lucide-icon>
+            {{ badgeLabel }}
           </span>
         </div>
       </div>
@@ -66,8 +67,8 @@ export interface Service {
             </div>
           </div>
           
-          <button class="service-cta btn-primary px-6 py-2 text-sm font-semibold">
-            En savoir plus
+          <button class="service-cta btn-primary px-6 py-2 text-sm font-semibold" *ngIf="ctaLabel">
+            {{ ctaLabel }}
             <lucide-icon name="chevron-right" class="w-4 h-4 ml-2"></lucide-icon>
           </button>
         </div>
@@ -164,13 +165,20 @@ export interface Service {
 })
 export class ServiceCardComponent {
   @Input() service!: Service;
+  imageUrl = '';
+  ctaLabel = '';
+  badgeLabel = '';
+  badgeIcon = '';
+
+  constructor(public api: ApiService) {}
 
   getIconName(): string {
     const iconMap: Record<string, string> = {
       'car': 'car',
-      'motorcycle': 'car', // fallback since motorcycle is not available
       'file-text': 'file-text',
-      'award': 'award'
+      'award': 'award',
+      'calendar': 'calendar',
+      'users': 'users'
     };
     return iconMap[this.service.icon] || 'car';
   }
@@ -191,5 +199,25 @@ export class ServiceCardComponent {
       'code': 'Code'
     };
     return categoryLabelMap[this.service.category] || 'Formation';
+  }
+
+  ngOnInit() {
+    const byId = (this.service as any)?.image_media_id;
+    if (byId) {
+      this.api.getMediaById(byId).subscribe({ next: (m) => this.imageUrl = this.api.resolveMediaUrl(m), error: () => {} });
+      return;
+    }
+    const raw = (this.service as any)?.image_url || (this.service as any)?.image;
+    if (raw) this.imageUrl = this.api.resolveMediaUrl({ url: raw });
+    this.api.getContent('service_card','cta_label').subscribe({ next: (i) => this.ctaLabel = i?.content || '', error: () => {} });
+    this.api.getContent('service_card','badge').subscribe({ next: (i) => {
+      try {
+        const map = JSON.parse(i?.content || '{}');
+        const key = (this.service?.category || '').toLowerCase();
+        const cfg = map[key];
+        if (cfg) { this.badgeLabel = cfg.label || ''; this.badgeIcon = cfg.icon || ''; }
+        else { this.badgeLabel = ''; this.badgeIcon = ''; }
+      } catch { this.badgeLabel = ''; this.badgeIcon = ''; }
+    }, error: () => {} });
   }
 }

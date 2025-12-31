@@ -35,8 +35,7 @@ import { ContactInfo } from '../../models/content.models';
               <lucide-icon name="map-pin" class="contact-icon"></lucide-icon>
             </div>
             <h3 class="contact-info-title">Adresse</h3>
-            <p class="contact-info-text">{{ contactInfo?.address || '6, rue Joseph Dijon' }}</p>
-            <p class="contact-info-text">75018 Paris</p>
+            <p class="contact-info-text">{{ contactInfo?.address }}</p>
           </div>
           <div class="contact-info-item">
             <div class="contact-icon-wrapper">
@@ -44,11 +43,10 @@ import { ContactInfo } from '../../models/content.models';
             </div>
             <h3 class="contact-info-title">Téléphone</h3>
             <p class="contact-info-text">
-              <a href="tel:{{ contactInfo?.phone || '0142589632' }}" class="contact-link">
-                {{ contactInfo?.phone || '01 42 58 96 32' }}
+              <a *ngIf="contactInfo?.phone" href="tel:{{ contactInfo?.phone }}" class="contact-link">
+                {{ contactInfo?.phone }}
               </a>
             </p>
-            <p class="contact-info-text">Du lundi au samedi</p>
           </div>
           <div class="contact-info-item">
             <div class="contact-icon-wrapper">
@@ -56,19 +54,17 @@ import { ContactInfo } from '../../models/content.models';
             </div>
             <h3 class="contact-info-title">Email</h3>
             <p class="contact-info-text">
-              <a href="mailto:{{ contactInfo?.email || 'contact@autoecole18.fr' }}" class="contact-link">
-                {{ contactInfo?.email || 'contact@autoecole18.fr' }}
+              <a *ngIf="contactInfo?.email" href="mailto:{{ contactInfo?.email }}" class="contact-link">
+                {{ contactInfo?.email }}
               </a>
             </p>
-            <p class="contact-info-text">Réponse sous 24h</p>
           </div>
           <div class="contact-info-item">
             <div class="contact-icon-wrapper">
               <lucide-icon name="clock" class="contact-icon"></lucide-icon>
             </div>
             <h3 class="contact-info-title">Horaires</h3>
-            <p class="contact-info-text">{{ contactInfo?.hours || 'Lun-Ven: 8h-19h' }}</p>
-            <p class="contact-info-text">Sam: 9h-17h</p>
+            <p class="contact-info-text">{{ contactInfo?.hours }}</p>
           </div>
         </div>
       </div>
@@ -78,7 +74,7 @@ import { ContactInfo } from '../../models/content.models';
     <section class="map-section">
       <div class="map-container">
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937604!2d2.352221951743918!3d48.85661407905357!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e1f06e2b70f%3A0x40b82c3688c9460!2s6%20Rue%20Joseph%20Dijon%2C%2075018%20Paris!5e0!3m2!1sfr!2sfr!4v1700000000000!5m2!1sfr!2sfr"
+          [src]="mapUrl"
           width="100%" 
           height="400" 
           style="border:0;" 
@@ -330,6 +326,7 @@ export class ContactComponent implements OnInit {
   contactInfo: ContactInfo | null = null;
   isSubmitting = false;
   submitSuccess = false;
+  mapUrl = '';
 
   constructor(
     private fb: FormBuilder,
@@ -348,6 +345,9 @@ export class ContactComponent implements OnInit {
     this.contentService.getContactInfo().subscribe(info => {
       this.contactInfo = info;
     });
+    // Map URL from Content
+    // Expect text or URL string stored at page 'contact', section 'map_url'
+    (this.contentService as any).api.getContent('contact','map_url').subscribe({ next: (i: any) => this.mapUrl = i?.content || '', error: () => {} });
   }
 
   onSubmit() {

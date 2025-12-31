@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Phone, Mail, MapPin, Clock, Car } from 'lucide-angular';
-import { ContentService } from '../../../services/content.service';
-import { ContactInfo } from '../../../models/content.models';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-footer',
@@ -17,18 +16,15 @@ import { ContactInfo } from '../../../models/content.models';
             <!-- Company Info -->
             <div class="footer-section">
               <div class="footer-brand">
-                <div class="footer-logo">
-                  <lucide-icon name="car" class="footer-logo-icon"></lucide-icon>
+                <div class="footer-logo" *ngIf="brandIcon">
+                  <lucide-icon [name]="brandIcon" class="footer-logo-icon"></lucide-icon>
                 </div>
                 <div class="footer-brand-text">
-                  <h3 class="footer-brand-title">Auto-École CAR 18ème</h3>
-                  <p class="footer-brand-subtitle">Votre réussite, notre priorité</p>
+                  <h3 class="footer-brand-title" *ngIf="brandTitle">{{ brandTitle }}</h3>
+                  <p class="footer-brand-subtitle" *ngIf="brandSubtitle">{{ brandSubtitle }}</p>
                 </div>
               </div>
-              <p class="footer-description">
-                Auto-école professionnelle au cœur du 18e arrondissement de Paris. 
-                Plus de 5000 permis délivrés avec un taux de réussite exceptionnel.
-              </p>
+              <p class="footer-description" *ngIf="brandDescription">{{ brandDescription }}</p>
             </div>
 
             <!-- Contact Info -->
@@ -36,24 +32,20 @@ import { ContactInfo } from '../../../models/content.models';
               <h4 class="footer-section-title">Nous contacter</h4>
               <div class="footer-contact">
                 <div class="contact-item">
-                  <lucide-icon name="map-pin" class="contact-icon"></lucide-icon>
-                  <span>{{ contactInfo?.address || '6, rue Joseph Dijon, 75018 Paris' }}</span>
+                  <lucide-icon [name]="iconAddress" class="contact-icon" *ngIf="iconAddress"></lucide-icon>
+                  <span *ngIf="businessInfo?.address">{{ businessInfo?.address }}</span>
                 </div>
                 <div class="contact-item">
-                  <lucide-icon name="phone" class="contact-icon"></lucide-icon>
-                  <a href="tel:{{ contactInfo?.phone || '0142589632' }}" class="contact-link">
-                    {{ contactInfo?.phone || '01 42 58 96 32' }}
-                  </a>
+                  <lucide-icon [name]="iconPhone" class="contact-icon" *ngIf="iconPhone"></lucide-icon>
+                  <a *ngIf="businessInfo?.phone" href="tel:{{ businessInfo?.phone }}" class="contact-link">{{ businessInfo?.phone }}</a>
                 </div>
                 <div class="contact-item">
-                  <lucide-icon name="mail" class="contact-icon"></lucide-icon>
-                  <a href="mailto:{{ contactInfo?.email || 'contact@autoecole18.fr' }}" class="contact-link">
-                    {{ contactInfo?.email || 'contact@autoecole18.fr' }}
-                  </a>
+                  <lucide-icon [name]="iconEmail" class="contact-icon" *ngIf="iconEmail"></lucide-icon>
+                  <a *ngIf="businessInfo?.email" href="mailto:{{ businessInfo?.email }}" class="contact-link">{{ businessInfo?.email }}</a>
                 </div>
                 <div class="contact-item">
-                  <lucide-icon name="clock" class="contact-icon"></lucide-icon>
-                  <span>{{ contactInfo?.hours || 'Lun-Ven: 8h-19h, Sam: 9h-17h' }}</span>
+                  <lucide-icon [name]="iconHours" class="contact-icon" *ngIf="iconHours"></lucide-icon>
+                  <span *ngIf="hoursText">{{ hoursText }}</span>
                 </div>
               </div>
             </div>
@@ -63,10 +55,10 @@ import { ContactInfo } from '../../../models/content.models';
               <h4 class="footer-section-title">Navigation</h4>
               <nav class="footer-nav">
                 <ul class="footer-nav-list">
-                  <li><a routerLink="/" class="footer-nav-link">Accueil</a></li>
-                  <li><a routerLink="/services" class="footer-nav-link">Services</a></li>
-                  <li><a routerLink="/about" class="footer-nav-link">À propos</a></li>
-                  <li><a routerLink="/contact" class="footer-nav-link">Contact</a></li>
+                  <li><a routerLink="/" class="footer-nav-link">{{ navLabels.home }}</a></li>
+                  <li><a routerLink="/services" class="footer-nav-link">{{ navLabels.services }}</a></li>
+                  <li><a routerLink="/about" class="footer-nav-link">{{ navLabels.about }}</a></li>
+                  <li><a routerLink="/contact" class="footer-nav-link">{{ navLabels.contact }}</a></li>
                 </ul>
               </nav>
             </div>
@@ -87,12 +79,12 @@ import { ContactInfo } from '../../../models/content.models';
         <div class="container-modern">
           <div class="footer-bottom-content">
             <p class="footer-copyright">
-              © {{ currentYear }} Auto-École CAR 18ème. Tous droits réservés.
+              © {{ currentYear }} <span *ngIf="businessInfo?.name">{{ businessInfo?.name }}</span>
             </p>
             <div class="footer-bottom-links">
-              <a routerLink="/legal" class="footer-bottom-link">Mentions légales</a>
-              <span class="footer-bottom-separator">•</span>
-              <a routerLink="/privacy" class="footer-bottom-link">Politique de confidentialité</a>
+              <a routerLink="/legal" class="footer-bottom-link" *ngIf="legalLabel">{{ legalLabel }}</a>
+              <span class="footer-bottom-separator" *ngIf="legalLabel && privacyLabel">•</span>
+              <a routerLink="/privacy" class="footer-bottom-link" *ngIf="privacyLabel">{{ privacyLabel }}</a>
             </div>
           </div>
         </div>
@@ -220,16 +212,45 @@ import { ContactInfo } from '../../../models/content.models';
   `]
 })
 export class FooterComponent implements OnInit {
-  contactInfo: ContactInfo | null = null;
+  businessInfo: any = null;
   services: any[] = [];
   currentYear = new Date().getFullYear();
+  brandTitle = '';
+  brandSubtitle = '';
+  brandDescription = '';
+  navLabels: { home?: string; services?: string; about?: string; contact?: string } = {};
+  legalLabel = '';
+  privacyLabel = '';
+  iconAddress = '';
+  iconPhone = '';
+  iconEmail = '';
+  iconHours = '';
+  brandIcon = '';
+  hoursText = '';
 
-  constructor(private contentService: ContentService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.contentService.getContactInfo().subscribe(info => {
-      this.contactInfo = info;
-    });
-    this.contentService.getServices().subscribe(s => this.services = s);
+    this.api.getBusinessInfo().subscribe({ next: (info) => {
+      this.businessInfo = info;
+      const h = (info as any)?.opening_hours;
+      if (h) this.hoursText = h;
+    }, error: () => console.warn('[footer] business info missing') });
+    this.api.getServices().subscribe({ next: (s) => this.services = s || [], error: () => console.warn('[footer] services missing') });
+    this.api.getContent('footer','brand_title').subscribe({ next: (i) => this.brandTitle = i?.content || '', error: () => console.warn('[footer] brand_title missing') });
+    this.api.getContent('footer','brand_subtitle').subscribe({ next: (i) => this.brandSubtitle = i?.content || '', error: () => console.warn('[footer] brand_subtitle missing') });
+    this.api.getContent('footer','brand_description').subscribe({ next: (i) => this.brandDescription = i?.content || '', error: () => console.warn('[footer] brand_description missing') });
+    this.api.getContent('footer','brand_icon').subscribe({ next: (i) => this.brandIcon = i?.content || '', error: () => {} });
+    this.api.getContent('header','nav_home').subscribe({ next: (i) => this.navLabels.home = i?.content || '', error: () => {} });
+    this.api.getContent('header','nav_services').subscribe({ next: (i) => this.navLabels.services = i?.content || '', error: () => {} });
+    this.api.getContent('header','nav_about').subscribe({ next: (i) => this.navLabels.about = i?.content || '', error: () => {} });
+    this.api.getContent('header','nav_contact').subscribe({ next: (i) => this.navLabels.contact = i?.content || '', error: () => {} });
+    this.api.getContent('footer','legal_label').subscribe({ next: (i) => this.legalLabel = i?.content || '', error: () => {} });
+    this.api.getContent('footer','privacy_label').subscribe({ next: (i) => this.privacyLabel = i?.content || '', error: () => {} });
+    this.api.getContent('footer','icon_address').subscribe({ next: (i) => this.iconAddress = i?.content || '', error: () => {} });
+    this.api.getContent('footer','icon_phone').subscribe({ next: (i) => this.iconPhone = i?.content || '', error: () => {} });
+    this.api.getContent('footer','icon_email').subscribe({ next: (i) => this.iconEmail = i?.content || '', error: () => {} });
+    this.api.getContent('footer','icon_hours').subscribe({ next: (i) => this.iconHours = i?.content || '', error: () => {} });
+    this.api.getContent('footer','hours').subscribe({ next: (i) => { if (!this.hoursText) this.hoursText = i?.content || ''; }, error: () => {} });
   }
 }

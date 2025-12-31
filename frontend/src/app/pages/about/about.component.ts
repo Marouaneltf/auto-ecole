@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { LucideAngularModule, Award, Users, Car, Clock, CheckCircle, MapPin, Phone, Mail } from 'lucide-angular';
-import { ContentService } from '../../services/content.service';
+import { ApiService } from '../../services/api.service';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { AboutContent } from '../../models/content.models';
 
@@ -47,7 +47,7 @@ import { AboutContent } from '../../models/content.models';
             </div>
           </div>
           <div class="story-image">
-            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Auto-école" class="story-img">
+            <img *ngIf="aboutImageUrl" [src]="aboutImageUrl" alt="Auto-école" class="story-img">
           </div>
         </div>
       </div>
@@ -57,37 +57,16 @@ import { AboutContent } from '../../models/content.models';
     <section class="values-section section-padding bg-gray-50">
       <div class="container-modern">
         <div class="section-header text-center">
-          <h2 class="section-title">Nos valeurs</h2>
-          <p class="section-subtitle">Ce qui nous guide chaque jour</p>
+          <h2 class="section-title">{{ valuesTitle }}</h2>
+          <p class="section-subtitle">{{ valuesSubtitle }}</p>
         </div>
         <div class="values-grid">
-          <div class="value-item">
-            <div class="value-icon">
-              <lucide-icon name="award" class="w-8 h-8"></lucide-icon>
+          <div class="value-item" *ngFor="let v of values">
+            <div class="value-icon" *ngIf="v.icon">
+              <lucide-icon [name]="v.icon" class="w-8 h-8"></lucide-icon>
             </div>
-            <h3 class="value-title">Excellence</h3>
-            <p class="value-description">Nous visons l'excellence dans chaque aspect de notre enseignement, avec des instructeurs hautement qualifiés et une méthode pédagogique éprouvée.</p>
-          </div>
-          <div class="value-item">
-            <div class="value-icon">
-              <lucide-icon name="users" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="value-title">Personnalisation</h3>
-            <p class="value-description">Chaque élève est unique, nous adaptons notre enseignement à vos besoins spécifiques et à votre rythme d'apprentissage.</p>
-          </div>
-          <div class="value-item">
-            <div class="value-icon">
-              <lucide-icon name="car" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="value-title">Sécurité</h3>
-            <p class="value-description">La sécurité est notre priorité absolue. Nous formons des conducteurs responsables et consciencieux.</p>
-          </div>
-          <div class="value-item">
-            <div class="value-icon">
-              <lucide-icon name="clock" class="w-8 h-8"></lucide-icon>
-            </div>
-            <h3 class="value-title">Flexibilité</h3>
-            <p class="value-description">Nous nous adaptons à vos disponibilités avec des horaires flexibles et des formules adaptées à votre emploi du temps.</p>
+            <h3 class="value-title">{{ v.title }}</h3>
+            <p class="value-description">{{ v.description }}</p>
           </div>
         </div>
       </div>
@@ -121,51 +100,35 @@ import { AboutContent } from '../../models/content.models';
     <section class="team-section section-padding bg-gray-50">
       <div class="container-modern">
         <div class="section-header text-center">
-          <h2 class="section-title">Notre équipe</h2>
-          <p class="section-subtitle">Des professionnels passionnés à votre service</p>
+          <h2 class="section-title">{{ teamTitle }}</h2>
+          <p class="section-subtitle">{{ teamSubtitle }}</p>
         </div>
         <div class="team-grid">
-          <div class="team-member">
+          <div class="team-member" *ngFor="let m of team; let i = index">
             <div class="member-avatar">
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructeur" class="avatar-img">
+              <img *ngIf="m.image_url" [src]="m.image_url" [alt]="m.name" class="avatar-img">
             </div>
-            <h3 class="member-name">Jean Dupont</h3>
-            <p class="member-role">Instructeur principal</p>
-            <p class="member-description">15 ans d'expérience, spécialiste permis B</p>
-          </div>
-          <div class="team-member">
-            <div class="member-avatar">
-              <img src="https://images.unsplash.com/photo-1494790108755-2616b612b5bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructrice" class="avatar-img">
-            </div>
-            <h3 class="member-name">Marie Martin</h3>
-            <p class="member-role">Instructrice moto</p>
-            <p class="member-description">Spécialiste permis A et formation accélérée</p>
-          </div>
-          <div class="team-member">
-            <div class="member-avatar">
-              <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Instructeur" class="avatar-img">
-            </div>
-            <h3 class="member-name">Pierre Bernard</h3>
-            <p class="member-role">Instructeur code</p>
-            <p class="member-description">Expert en pédagogie et formation en ligne</p>
+            <h3 class="member-name">{{ m.name }}</h3>
+            <p class="member-role">{{ m.role }}</p>
+            <p class="member-description">{{ m.description }}</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section section-padding bg-primary-600">
+    <section class="cta-section section-padding bg-primary-600" *ngIf="ctaTitle || ctaSubtitle">
       <div class="container-modern text-center">
-        <h2 class="cta-title">Prêt à nous rejoindre ?</h2>
-        <p class="cta-subtitle">Commencez votre formation dès aujourd'hui</p>
+        <h2 class="cta-title" *ngIf="ctaTitle">{{ ctaTitle }}</h2>
+        <p class="cta-subtitle" *ngIf="ctaSubtitle">{{ ctaSubtitle }}</p>
         <div class="cta-actions">
-          <button routerLink="/contact" class="btn-primary">
-            Prendre rendez-vous
+          <button routerLink="/contact" class="btn-primary" *ngIf="ctaPrimaryLabel">
+            {{ ctaPrimaryLabel }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
-          <button class="btn-secondary">
+          <button class="btn-secondary" *ngIf="businessPhone">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
-            01 42 58 96 32
+            {{ businessPhone }}
           </button>
         </div>
       </div>
@@ -420,12 +383,65 @@ import { AboutContent } from '../../models/content.models';
 })
 export class AboutComponent implements OnInit {
   aboutContent: AboutContent | null = null;
+  aboutImageUrl = '';
+  values: Array<{ icon?: string; title: string; description: string }> = [];
+  valuesTitle = 'Nos valeurs';
+  valuesSubtitle = 'Ce qui nous guide chaque jour';
+  team: Array<{ name: string; role: string; description: string; image_url?: string; image?: number | string }> = [];
+  teamTitle = 'Notre équipe';
+  teamSubtitle = 'Des professionnels passionnés à votre service';
+  ctaTitle = '';
+  ctaSubtitle = '';
+  ctaPrimaryLabel = '';
+  businessPhone = '';
 
-  constructor(private contentService: ContentService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
-    this.contentService.getAboutContent().subscribe(content => {
-      this.aboutContent = content;
-    });
+    this.api.getContent('about','story_text').subscribe({ next: (i) => {
+      const story = i?.content || '';
+      this.aboutContent = { ...(this.aboutContent || { title: '', description: '', story: '', timeline: [] }), story };
+    }, error: () => console.warn('[about] story_text missing') });
+    this.api.getContent('about','timeline').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        const list = Array.isArray(arr) ? arr : [];
+        this.aboutContent = { ...(this.aboutContent || { title: '', description: '', story: '', timeline: [] }), timeline: list };
+      } catch { /* ignore */ }
+    }, error: () => console.warn('[about] timeline missing') });
+    this.api.getContent('about','image').subscribe({ next: (i) => {
+      if (i?.content_type === 'media') {
+        const raw = i.content;
+        const id = Number(raw);
+        if (!isNaN(id) && id > 0) {
+          this.api.getMediaById(id).subscribe({ next: (m) => this.aboutImageUrl = this.api.resolveMediaUrl(m), error: () => {} });
+        } else if (typeof raw === 'string') {
+          this.aboutImageUrl = this.api.resolveMediaUrl({ url: raw });
+        }
+      }
+    }, error: () => console.warn('[about] image missing') });
+    this.api.getContent('about','values').subscribe({ next: (i) => { try { const arr = JSON.parse(i?.content || '[]'); this.values = Array.isArray(arr) ? arr : []; } catch { this.values = []; } }, error: () => {} });
+    this.api.getContent('about','values_title').subscribe({ next: (i) => this.valuesTitle = i?.content || this.valuesTitle, error: () => {} });
+    this.api.getContent('about','values_subtitle').subscribe({ next: (i) => this.valuesSubtitle = i?.content || this.valuesSubtitle, error: () => {} });
+    this.api.getContent('about','team').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        this.team = Array.isArray(arr) ? arr : [];
+        this.team.forEach((m, idx) => {
+          const id = Number(m.image);
+          if (!isNaN(id) && id > 0) {
+            this.api.getMediaById(id).subscribe({ next: (media) => this.team[idx].image_url = this.api.resolveMediaUrl(media), error: () => {} });
+          } else if (typeof m.image === 'string') {
+            this.team[idx].image_url = this.api.resolveMediaUrl({ url: m.image });
+          }
+        });
+      } catch { this.team = []; }
+    }, error: () => {} });
+    this.api.getContent('about','team_title').subscribe({ next: (i) => this.teamTitle = i?.content || this.teamTitle, error: () => {} });
+    this.api.getContent('about','team_subtitle').subscribe({ next: (i) => this.teamSubtitle = i?.content || this.teamSubtitle, error: () => {} });
+    this.api.getContent('about','cta_title').subscribe({ next: (i) => this.ctaTitle = i?.content || '', error: () => {} });
+    this.api.getContent('about','cta_subtitle').subscribe({ next: (i) => this.ctaSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('about','cta_primary_label').subscribe({ next: (i) => this.ctaPrimaryLabel = i?.content || '', error: () => {} });
+    this.api.getBusinessInfo().subscribe({ next: (info) => this.businessPhone = info?.phone || '', error: () => {} });
   }
 }

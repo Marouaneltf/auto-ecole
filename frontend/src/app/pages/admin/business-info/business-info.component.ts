@@ -6,11 +6,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-input.component';
+import { AdminImagePickerComponent } from '../../../admin/shared/admin-image-picker/admin-image-picker.component';
 
 @Component({
   selector: 'app-business-info',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule, MatSnackBarModule, AdminInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, MatCardModule, MatButtonModule, MatSnackBarModule, AdminInputComponent, AdminImagePickerComponent],
   template: `
     <div class="container">
       <mat-card>
@@ -36,6 +37,9 @@ import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-inp
             <div class="full-width">
               <app-admin-input label="Liens sociaux (JSON)" kind="textarea" [rows]="2" placeholder='{"facebook":"url","instagram":"url"}' formControlName="social_links"></app-admin-input>
             </div>
+            <div class="full-width">
+              <app-admin-image-picker label="Logo" [(selectedId)]="logoMediaId"></app-admin-image-picker>
+            </div>
             <button mat-raised-button color="primary" type="submit" [disabled]="isSaving">{{ isSaving ? 'Enregistrement...' : 'Enregistrer' }}</button>
           </form>
         </mat-card-content>
@@ -51,6 +55,7 @@ import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-inp
 export class BusinessInfoComponent implements OnInit {
   form: FormGroup;
   isSaving = false;
+  logoMediaId: number | null = null;
 
   constructor(private fb: FormBuilder, private api: ApiService, private snack: MatSnackBar) {
     this.form = this.fb.group({
@@ -76,6 +81,7 @@ export class BusinessInfoComponent implements OnInit {
           opening_hours: (data as any)?.opening_hours || '',
           social_links: (data as any)?.social_links ? JSON.stringify((data as any).social_links) : ''
         });
+        this.logoMediaId = (data as any)?.logo_media_id || null;
       },
       error: () => {}
     });
@@ -87,6 +93,7 @@ export class BusinessInfoComponent implements OnInit {
     if (value.social_links) {
       try { value.social_links = JSON.parse(value.social_links); } catch { this.snack.open('Liens sociaux doivent être un JSON valide', 'Fermer', { duration: 3000 }); this.isSaving = false; return; }
     } else { value.social_links = null; }
+    value.logo_media_id = this.logoMediaId || null;
     this.api.updateBusinessInfo(value).subscribe({
       next: () => { this.snack.open('Informations enregistrées', 'Fermer', { duration: 3000 }); this.isSaving = false; },
       error: () => { this.snack.open('Erreur lors de la sauvegarde', 'Fermer', { duration: 3000 }); this.isSaving = false; }

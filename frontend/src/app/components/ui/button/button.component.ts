@@ -27,7 +27,7 @@ export class ButtonComponent {
   @Input() type: 'button' | 'submit' | 'reset' = 'button';
 
   get buttonClasses(): string {
-    const baseClasses = 'font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
+    const baseClasses = 'inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5';
     
     const variantClasses = {
       primary: 'bg-accent-500 hover:bg-accent-600 text-white',

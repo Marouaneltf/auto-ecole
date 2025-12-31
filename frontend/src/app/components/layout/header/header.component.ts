@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { LucideAngularModule, Menu, X, Phone, Car } from 'lucide-angular';
-import { ContentService } from '../../../services/content.service';
-import { BusinessInfo } from '../../../models/content.models';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-header',
@@ -16,12 +15,15 @@ import { BusinessInfo } from '../../../models/content.models';
           <!-- Logo -->
           <div class="logo">
             <a routerLink="/" class="logo-link">
-              <div class="logo-icon">
-                <lucide-icon name="car" class="car-icon"></lucide-icon>
+              <div class="logo-icon" *ngIf="!logoUrl && logoIcon">
+                <lucide-icon [name]="logoIcon" class="car-icon"></lucide-icon>
+              </div>
+              <div class="logo-image" *ngIf="logoUrl">
+                <img [src]="logoUrl" alt="Logo" class="logo-img" />
               </div>
               <div class="logo-text">
-                <span class="logo-title">{{ businessInfo?.name || 'Auto-École CAR 18ème' }}</span>
-                <span class="logo-subtitle">Permis de conduire Paris</span>
+                <span class="logo-title" *ngIf="businessInfo?.name">{{ businessInfo?.name }}</span>
+                <span class="logo-subtitle" *ngIf="subtitle">{{ subtitle }}</span>
               </div>
             </a>
           </div>
@@ -29,22 +31,20 @@ import { BusinessInfo } from '../../../models/content.models';
           <!-- Desktop Navigation -->
           <nav class="desktop-nav">
             <ul class="nav-list">
-              <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Accueil</a></li>
-              <li><a routerLink="/services" routerLinkActive="active" class="nav-link">Services</a></li>
-              <li><a routerLink="/about" routerLinkActive="active" class="nav-link">À propos</a></li>
-              <li><a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact</a></li>
+              <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">{{ navLabels.home }}</a></li>
+              <li><a routerLink="/services" routerLinkActive="active" class="nav-link">{{ navLabels.services }}</a></li>
+              <li><a routerLink="/about" routerLinkActive="active" class="nav-link">{{ navLabels.about }}</a></li>
+              <li><a routerLink="/contact" routerLinkActive="active" class="nav-link">{{ navLabels.contact }}</a></li>
             </ul>
           </nav>
 
           <!-- Desktop CTA -->
           <div class="desktop-cta">
-            <a href="tel:{{ businessInfo?.phone || '0142589632' }}" class="phone-link">
-              <lucide-icon name="phone" class="phone-icon"></lucide-icon>
-              <span>{{ businessInfo?.phone || '01 42 58 96 32' }}</span>
+            <a *ngIf="businessInfo?.phone" href="tel:{{ businessInfo?.phone }}" class="phone-link">
+              <lucide-icon [name]="phoneIcon" class="phone-icon" *ngIf="phoneIcon"></lucide-icon>
+              <span>{{ businessInfo?.phone }}</span>
             </a>
-            <a routerLink="/contact" class="btn-primary">
-              Nous contacter
-            </a>
+            <a routerLink="/contact" class="btn-primary" *ngIf="ctaPrimaryLabel">{{ ctaPrimaryLabel }}</a>
           </div>
 
           <!-- Mobile Menu Toggle -->
@@ -53,8 +53,8 @@ import { BusinessInfo } from '../../../models/content.models';
             (click)="toggleMobileMenu()"
             [class.active]="isMobileMenuOpen"
           >
-            <lucide-icon name="menu" class="menu-icon" *ngIf="!isMobileMenuOpen"></lucide-icon>
-            <lucide-icon name="x" class="menu-icon" *ngIf="isMobileMenuOpen"></lucide-icon>
+            <lucide-icon [name]="menuIcon" class="menu-icon" *ngIf="!isMobileMenuOpen && menuIcon"></lucide-icon>
+            <lucide-icon [name]="closeIcon" class="menu-icon" *ngIf="isMobileMenuOpen && closeIcon"></lucide-icon>
           </button>
         </div>
 
@@ -63,16 +63,16 @@ import { BusinessInfo } from '../../../models/content.models';
           <div class="mobile-nav-content">
             <nav class="mobile-nav-menu">
               <ul class="mobile-nav-list">
-                <li><a routerLink="/" (click)="closeMobileMenu()" class="mobile-nav-link">Accueil</a></li>
-                <li><a routerLink="/services" (click)="closeMobileMenu()" class="mobile-nav-link">Services</a></li>
-                <li><a routerLink="/about" (click)="closeMobileMenu()" class="mobile-nav-link">À propos</a></li>
-                <li><a routerLink="/contact" (click)="closeMobileMenu()" class="mobile-nav-link">Contact</a></li>
+                <li><a routerLink="/" (click)="closeMobileMenu()" class="mobile-nav-link">{{ navLabels.home }}</a></li>
+                <li><a routerLink="/services" (click)="closeMobileMenu()" class="mobile-nav-link">{{ navLabels.services }}</a></li>
+                <li><a routerLink="/about" (click)="closeMobileMenu()" class="mobile-nav-link">{{ navLabels.about }}</a></li>
+                <li><a routerLink="/contact" (click)="closeMobileMenu()" class="mobile-nav-link">{{ navLabels.contact }}</a></li>
               </ul>
             </nav>
             <div class="mobile-cta">
-              <a href="tel:{{ businessInfo?.phone || '0142589632' }}" class="btn-primary w-full">
-                <lucide-icon name="phone" class="mr-2"></lucide-icon>
-                Appeler maintenant
+              <a *ngIf="businessInfo?.phone && ctaMobileLabel" href="tel:{{ businessInfo?.phone }}" class="btn-primary w-full">
+                <lucide-icon [name]="phoneIcon" class="mr-2" *ngIf="phoneIcon"></lucide-icon>
+                {{ ctaMobileLabel }}
               </a>
             </div>
           </div>
@@ -204,17 +204,46 @@ import { BusinessInfo } from '../../../models/content.models';
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       }
     }
+    .logo-image{display:flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:8px; overflow:hidden; background:rgba(255,255,255,0.9); border:1px solid rgba(17,24,39,0.08)}
+    .logo-img{width:100%; height:100%; object-fit:contain}
   `]
 })
 export class HeaderComponent implements OnInit {
   isScrolled = false;
   isMobileMenuOpen = false;
   businessInfo: any = null;
+  navLabels: { home?: string; services?: string; about?: string; contact?: string } = {};
+  subtitle = '';
+  logoUrl = '';
+  logoIcon = '';
+  phoneIcon = 'phone';
+  menuIcon = 'menu';
+  closeIcon = 'x';
+  ctaPrimaryLabel = '';
+  ctaMobileLabel = '';
 
-  constructor(private contentService: ContentService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
     window.addEventListener('scroll', this.onScroll.bind(this));
+    this.api.getBusinessInfo().subscribe({ next: (data) => {
+      this.businessInfo = data;
+      const id = (data as any)?.logo_media_id;
+      if (id) this.api.getMediaById(id).subscribe({ next: (m) => this.logoUrl = this.api.resolveMediaUrl(m), error: () => {} });
+    }, error: () => console.warn('[header] business info missing') });
+    this.api.getContent('header','nav_home').subscribe({ next: (i) => this.navLabels.home = i?.content || '', error: () => console.warn('[header] nav_home missing') });
+    this.api.getContent('header','nav_services').subscribe({ next: (i) => this.navLabels.services = i?.content || '', error: () => console.warn('[header] nav_services missing') });
+    this.api.getContent('header','nav_about').subscribe({ next: (i) => this.navLabels.about = i?.content || '', error: () => console.warn('[header] nav_about missing') });
+    this.api.getContent('header','nav_contact').subscribe({ next: (i) => this.navLabels.contact = i?.content || '', error: () => console.warn('[header] nav_contact missing') });
+    this.api.getContent('header','subtitle').subscribe({ next: (i) => this.subtitle = i?.content || '', error: () => {} });
+    this.api.getContent('header','cta_primary_label').subscribe({ next: (i) => this.ctaPrimaryLabel = i?.content || '', error: () => {} });
+    this.api.getContent('header','cta_mobile_label').subscribe({ next: (i) => this.ctaMobileLabel = i?.content || '', error: () => {} });
+    this.api.getContent('header','logo_icon').subscribe({ next: (i) => this.logoIcon = i?.content || '', error: () => {} });
+    this.api.getContent('header','menu_icon').subscribe({ next: (i) => this.menuIcon = i?.content || 'menu', error: () => {} });
+    this.api.getContent('header','close_icon').subscribe({ next: (i) => this.closeIcon = i?.content || 'x', error: () => {} });
+    this.phoneIcon = 'phone';
+    setTimeout(() => this.updateHeaderHeightVar(), 0);
+    window.addEventListener('resize', () => this.updateHeaderHeightVar());
   }
 
   onScroll() {
@@ -229,5 +258,13 @@ export class HeaderComponent implements OnInit {
   closeMobileMenu() {
     this.isMobileMenuOpen = false;
     document.body.style.overflow = '';
+  }
+
+  private updateHeaderHeightVar() {
+    const el = document.querySelector('header.header') as HTMLElement | null;
+    if (el) {
+      const h = el.offsetHeight;
+      document.documentElement.style.setProperty('--header-height', `${h}px`);
+    }
   }
 }

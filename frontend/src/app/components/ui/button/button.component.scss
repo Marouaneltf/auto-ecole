@@ -7,6 +7,11 @@ button {
   position: relative;
   overflow: hidden;
   
+  /* Ensure icon reset works for projected content */
+    ::ng-deep lucide-icon,
+    ::ng-deep svg {
+      margin: 0 !important;
+    }
   &:before {
     content: '';
     position: absolute;

@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule, Star, Calendar, MessageCircle } from 'lucide-angular';
+import { ApiService } from '../../../services/api.service';
 
 export interface Testimonial {
   id: string;
@@ -9,6 +10,7 @@ export interface Testimonial {
   comment: string;
   image?: string;
   date?: string;
+  avatar_media_id?: number;
 }
 
 @Component({
@@ -24,8 +26,8 @@ export interface Testimonial {
       <div class="testimonial-header flex items-center mb-6">
         <div class="avatar-wrapper relative">
           <img 
-            *ngIf="testimonial.image" 
-            [src]="testimonial.image" 
+            *ngIf="imageUrl" 
+            [src]="imageUrl" 
             [alt]="testimonial.name" 
             class="avatar w-16 h-16 rounded-full object-cover border-4 border-white shadow-lg">
           <div 
@@ -189,8 +191,10 @@ export interface Testimonial {
     }
   `]
 })
-export class TestimonialCardComponent {
+export class TestimonialCardComponent implements OnInit {
   @Input() testimonial!: Testimonial;
+  imageUrl = '';
+  constructor(private api: ApiService) {}
 
   get stars(): number[] {
     return Array(this.testimonial.rating).fill(0);
@@ -221,5 +225,16 @@ export class TestimonialCardComponent {
       month: 'long',
       year: 'numeric'
     });
+  }
+
+  ngOnInit() {
+    if (this.testimonial?.image) {
+      this.imageUrl = this.testimonial.image;
+      return;
+    }
+    const id = (this.testimonial as any)?.avatar_media_id;
+    if (id) {
+      this.api.getMediaById(id).subscribe({ next: (m) => this.imageUrl = this.api.resolveMediaUrl(m), error: () => {} });
+    }
   }
 }

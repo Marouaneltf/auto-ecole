@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "seed": "npx ts-node src/seed.ts",
+    "seed": "npx ts-node src/run-seed.ts",
+    "seed:missing": "npx ts-node src/run-seed-missing.ts",
     "db:create": "npx ts-node src/setup-db.ts"
   },
   "keywords": [],

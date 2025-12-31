@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'path';
 import sequelize from './config/database';
+import { runSeedsIfEmpty } from './seeders/index';
 
 // Import models to ensure they are initialized
 import './models/User';
@@ -51,8 +52,9 @@ app.get('/', (req, res) => {
 });
 
 // Sync Database
-sequelize.sync().then(() => {
+sequelize.sync().then(async () => {
   console.log('Database synced');
+  try { await runSeedsIfEmpty(); } catch (e) { console.warn('Seed error', e); }
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });

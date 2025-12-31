@@ -24,6 +24,14 @@ import { CommonModule } from '@angular/common';
             <h3>Horaires</h3>
             <p>{{ hoursText || 'Lundi - Vendredi: 9h - 19h | Samedi: 9h - 13h' }}</p>
           </div>
+          <div class="footer-section" *ngIf="services?.length">
+            <h3>Nos services</h3>
+            <ul class="footer-services">
+              <li *ngFor="let s of services">
+                <a routerLink="/services" class="service-link">{{ s.name }}</a>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="footer-bottom">
           <p>&copy; {{ currentYear }} {{ businessInfo?.name }}. Tous droits réservés. <a routerLink="/legal">Mentions Légales</a></p>
@@ -53,6 +61,21 @@ import { CommonModule } from '@angular/common';
       color: #F59E0B; /* Accent color */
       margin-bottom: 15px;
     }
+    .footer-services {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .service-link {
+      color: #fff;
+      text-decoration: none;
+    }
+    .service-link:hover {
+      color: #F59E0B;
+    }
     .footer-bottom {
       border-top: 1px solid #555;
       padding-top: 20px;
@@ -73,6 +96,7 @@ export class FooterComponent implements OnInit {
   businessInfo: any;
   currentYear = new Date().getFullYear();
   hoursText = '';
+  services: Array<{ id: number; name: string }> = [];
 
   constructor(private apiService: ApiService) {}
 
@@ -94,6 +118,12 @@ export class FooterComponent implements OnInit {
         }
       },
       error: () => {}
+    });
+    this.apiService.getServices().subscribe({
+      next: (list) => {
+        this.services = (list || []).map((s: any) => ({ id: Number(s.id), name: String(s.name || '') })).slice(0, 6);
+      },
+      error: () => { this.services = []; }
     });
   }
 }

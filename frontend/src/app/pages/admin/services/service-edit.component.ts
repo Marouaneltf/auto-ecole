@@ -5,11 +5,12 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-input.component';
+import { AdminImagePickerComponent } from '../../../admin/shared/admin-image-picker/admin-image-picker.component';
 
 @Component({
   selector: 'app-admin-service-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule, AdminInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule, AdminInputComponent, AdminImagePickerComponent],
   template: `
     <div class="container">
       <div class="action-bar">
@@ -27,7 +28,16 @@ import { AdminInputComponent } from '../../../admin/shared/admin-input/admin-inp
         </div>
         <app-admin-input label="Prix (€)" type="number" formControlName="price"></app-admin-input>
         <app-admin-input label="Durée" formControlName="duration"></app-admin-input>
-        <app-admin-input label="Icône" placeholder="car, award, file-text" formControlName="icon"></app-admin-input>
+        <app-admin-input label="Icône" kind="select" formControlName="icon">
+          <option value="car">car</option>
+          <option value="award">award</option>
+          <option value="file-text">file-text</option>
+          <option value="calendar">calendar</option>
+          <option value="users">users</option>
+        </app-admin-input>
+        <div class="full">
+          <app-admin-image-picker label="Image du service" [(selectedId)]="imageMediaId"></app-admin-image-picker>
+        </div>
       </form>
     </div>
   `,
@@ -47,6 +57,7 @@ export class AdminServiceEditComponent implements OnInit {
   initial: any = null;
   isNew = false;
   id: number | null = null;
+  imageMediaId: number | null = null;
 
   constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router, private api: ApiService, private snack: MatSnackBar) {
     this.form = this.fb.group({
@@ -67,7 +78,7 @@ export class AdminServiceEditComponent implements OnInit {
       this.api.getServices().subscribe({
         next: (list) => {
           const s = list.find((x: any) => x.id === this.id);
-          if (s) { this.initial = s; this.form.patchValue(s); }
+          if (s) { this.initial = s; this.form.patchValue(s); this.imageMediaId = s.image_media_id || null; }
         },
         error: () => {}
       });
@@ -79,6 +90,7 @@ export class AdminServiceEditComponent implements OnInit {
   save() {
     const v = this.form.value as any;
     if (!this.form.valid) return;
+    v.image_media_id = this.imageMediaId || null;
     if (this.isNew) {
       this.api.createService(v).subscribe({
         next: () => { this.snack.open('Service créé', 'Fermer', { duration: 3000 }); this.goBack(); },

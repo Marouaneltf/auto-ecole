@@ -24,7 +24,7 @@ import {
   CheckCircle as CheckCircleIcon,
   AlertCircle
 } from 'lucide-angular';
-import { ContentService } from '../../services/content.service';
+import { ApiService } from '../../services/api.service';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { CardComponent } from '../../components/ui/card/card.component';
 import { ServiceCardComponent } from '../../components/shared/service-card/service-card.component';
@@ -57,7 +57,8 @@ import {
       <div class="hero-background absolute inset-0 z-0">
         <div class="hero-gradient-overlay"></div>
         <img 
-          [src]="heroContent?.backgroundImage || 'https://trae-api-sg.mchost.guru/api/ide/v1/text_to_image?prompt=Modern%20driving%20school%20car%20on%20Paris%20street%2C%20professional%20lighting%2C%20high%20quality%2C%20automotive%20photography&image_size=landscape_16_9'" 
+          *ngIf="heroContent?.backgroundImage"
+          [src]="heroContent?.backgroundImage" 
           alt="Auto-École CAR 18ème" 
           class="hero-image w-full h-full object-cover">
         <div class="hero-overlay"></div>
@@ -67,40 +68,32 @@ import {
         <div class="hero-badge mb-6 animate-fade-in">
           <span class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium">
             <lucide-icon name="star" class="w-4 h-4 mr-2 text-yellow-400"></lucide-icon>
-            Plus de 15 ans d'expérience
+            {{ heroBadge }}
           </span>
         </div>
         
         <h1 class="hero-headline text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-slide-up">
-          {{ heroContent?.headline || 'Votre permis de conduire en toute confiance' }}
+          {{ heroContent?.headline }}
         </h1>
         
         <p class="hero-subheadline text-xl md:text-2xl mb-8 max-w-3xl mx-auto animate-slide-up" style="animation-delay: 0.2s">
-          {{ heroContent?.subheadline || 'Réussissez votre permis avec notre méthode éprouvée et nos moniteurs certifiés. Taux de réussite exceptionnel et accompagnement personnalisé.' }}
+          {{ heroContent?.subheadline }}
         </p>
         
         <div class="hero-stats flex flex-wrap justify-center gap-8 mb-12 animate-slide-up" style="animation-delay: 0.4s">
-          <div class="stat-item">
-            <div class="stat-number text-3xl font-bold">95%</div>
-            <div class="stat-label text-sm opacity-90">Taux de réussite</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number text-3xl font-bold">5000+</div>
-            <div class="stat-label text-sm opacity-90">Élèves formés</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number text-3xl font-bold">4.8/5</div>
-            <div class="stat-label text-sm opacity-90">Avis clients</div>
+          <div class="stat-item" *ngFor="let s of heroStats">
+            <div class="stat-number text-3xl font-bold">{{ s.value }}</div>
+            <div class="stat-label text-sm opacity-90">{{ s.label }}</div>
           </div>
         </div>
         
         <div class="hero-actions flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style="animation-delay: 0.6s">
           <button class="btn-primary hero-cta text-lg px-8 py-4">
-            {{ heroContent?.ctaPrimary || 'Commencer maintenant' }}
+            {{ heroContent?.ctaPrimary }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
           <button class="btn-secondary hero-cta-secondary text-lg px-8 py-4">
-            {{ heroContent?.ctaSecondary || 'Nos services' }}
+            {{ heroContent?.ctaSecondary }}
           </button>
         </div>
       </div>
@@ -116,12 +109,12 @@ import {
     <section class="why-choose-us section-padding bg-gradient-to-b from-gray-50 to-white">
       <div class="container-modern">
         <div class="section-header text-center mb-16">
-          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">Pourquoi nous choisir</span>
+          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">{{ whyBadge }}</span>
           <h2 class="section-title text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            L'excellence à votre service
+            {{ whyTitle }}
           </h2>
           <p class="section-subtitle text-xl text-gray-600 max-w-3xl mx-auto">
-            Des milliers d'élèves nous font confiance pour leur réussite au permis de conduire
+            {{ whySubtitle }}
           </p>
         </div>
         
@@ -152,9 +145,9 @@ import {
           </div>
         </div>
         
-        <div class="text-center mt-16">
+        <div class="text-center mt-16" *ngIf="whyCtaLabel">
           <button class="btn-primary">
-            Découvrir tous nos avantages
+            {{ whyCtaLabel }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
         </div>
@@ -165,12 +158,12 @@ import {
     <section class="services section-padding bg-white">
       <div class="container-modern">
         <div class="section-header text-center mb-16">
-          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">Nos formations</span>
+          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">{{ servicesBadge }}</span>
           <h2 class="section-title text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Choisissez votre permis
+            {{ servicesTitle }}
           </h2>
           <p class="section-subtitle text-xl text-gray-600 max-w-3xl mx-auto">
-            Des formations adaptées à vos besoins et à votre rythme
+            {{ servicesSubtitle }}
           </p>
         </div>
         
@@ -190,9 +183,9 @@ import {
               Voir tous nos services
               <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
             </button>
-            <button class="btn-secondary text-lg px-8 py-4">
+            <button class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone">
               <lucide-icon name="phone" class="mr-2"></lucide-icon>
-              01 42 58 96 32
+              {{ businessPhone }}
             </button>
           </div>
         </div>
@@ -229,12 +222,12 @@ import {
     <section class="testimonials section-padding bg-gradient-to-br from-primary-50 to-accent-50">
       <div class="container-modern">
         <div class="section-header text-center mb-16">
-          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">Témoignages</span>
+          <span class="section-badge text-primary-600 font-semibold text-sm uppercase tracking-wide mb-4 block">{{ testimonialsBadge }}</span>
           <h2 class="section-title text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Ils ont réussi avec nous
+            {{ testimonialsTitle }}
           </h2>
           <p class="section-subtitle text-xl text-gray-600 max-w-3xl mx-auto">
-            Découvrez les expériences de nos élèves satisfaits
+            {{ testimonialsSubtitle }}
           </p>
         </div>
         
@@ -254,13 +247,13 @@ import {
           <button 
             (click)="previousTestimonial()" 
             class="testimonial-nav testimonial-nav-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
-            <lucide-icon name="chevron-left" class="w-6 h-6"></lucide-icon>
+            <lucide-icon [name]="testimonialsPrevIcon" class="w-6 h-6" *ngIf="testimonialsPrevIcon"></lucide-icon>
           </button>
           
           <button 
             (click)="nextTestimonial()" 
             class="testimonial-nav testimonial-nav-next absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
-            <lucide-icon name="chevron-right" class="w-6 h-6"></lucide-icon>
+            <lucide-icon [name]="testimonialsNextIcon" class="w-6 h-6" *ngIf="testimonialsNextIcon"></lucide-icon>
           </button>
           
           <!-- Carousel Indicators -->
@@ -279,15 +272,15 @@ import {
     <!-- CTA Section -->
     <section class="cta section-padding bg-gradient-to-r from-primary-600 to-primary-700">
       <div class="container-modern text-center">
-        <h2 class="cta-title text-3xl md:text-4xl font-bold mb-4">Prêt à commencer votre formation ?</h2>
-        <p class="cta-subtitle text-xl mb-8 max-w-2xl mx-auto">Contactez-nous dès aujourd'hui pour planifier votre premier cours</p>
+        <h2 class="cta-title text-3xl md:text-4xl font-bold mb-4">{{ ctaTitle }}</h2>
+        <p class="cta-subtitle text-xl mb-8 max-w-2xl mx-auto">{{ ctaSubtitle }}</p>
         <div class="cta-actions flex flex-col sm:flex-row gap-4 justify-center">
-          <button class="btn-secondary text-lg px-8 py-4">
+          <button class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
-            01 42 58 96 32
+            {{ businessPhone }}
           </button>
-          <button routerLink="/contact" class="btn-primary text-lg px-8 py-4">
-            Prendre rendez-vous
+          <button routerLink="/contact" class="btn-primary text-lg px-8 py-4" *ngIf="ctaPrimary">
+            {{ ctaPrimary }}
             <lucide-icon name="calendar" class="ml-2"></lucide-icon>
           </button>
         </div>
@@ -508,7 +501,7 @@ import {
     }
     
     .testimonials-container {
-      @apply relative overflow-hidden;
+      @apply relative overflow-hidden max-w-5xl mx-auto px-4;
     }
     
     .testimonials-wrapper {
@@ -524,11 +517,11 @@ import {
     }
     
     .testimonial-nav-prev {
-      @apply -left-6;
+      @apply -left-2 md:-left-6;
     }
     
     .testimonial-nav-next {
-      @apply -right-6;
+      @apply -right-2 md:-right-6;
     }
     
     .testimonial-indicators {
@@ -633,8 +626,26 @@ export class HomeComponent implements OnInit {
   learningSteps: LearningStep[] = [];
   currentTestimonialIndex = 0;
   testimonialInterval: any;
+  heroBadge = '';
+  heroStats: Array<{ value: string; label: string }> = [];
+  whyBadge = '';
+  whyTitle = '';
+  whySubtitle = '';
+  whyCtaLabel = '';
+  servicesBadge = '';
+  servicesTitle = '';
+  servicesSubtitle = '';
+  businessPhone = '';
+  testimonialsBadge = '';
+  testimonialsTitle = '';
+  testimonialsSubtitle = '';
+  testimonialsPrevIcon = 'chevron-left';
+  testimonialsNextIcon = 'chevron-right';
+  ctaTitle = '';
+  ctaSubtitle = '';
+  ctaPrimary = '';
 
-  constructor(private contentService: ContentService) {}
+  constructor(private api: ApiService) {}
 
   ngOnInit() {
     this.loadContent();
@@ -648,25 +659,94 @@ export class HomeComponent implements OnInit {
   }
 
   loadContent() {
-    this.contentService.getHeroContent().subscribe(content => {
-      this.heroContent = content;
-    });
+    this.api.getContent('home','hero_title').subscribe({ next: (i) => {
+      const v = i?.content || '';
+      this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), headline: v };
+    }, error: () => console.warn('[home] hero_title missing') });
+    this.api.getContent('home','hero_tagline').subscribe({ next: (i) => {
+      const v = i?.content || '';
+      this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), subheadline: v };
+    }, error: () => console.warn('[home] hero_tagline missing') });
+    this.api.getContent('home','hero_background').subscribe({ next: (i) => {
+      if (i?.content_type === 'media') {
+        const raw = i.content;
+        const id = Number(raw);
+        if (!isNaN(id) && id > 0) {
+          this.api.getMediaById(id).subscribe({ next: (m) => {
+            const url = this.api.resolveMediaUrl(m);
+            this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), backgroundImage: url };
+          }, error: () => {} });
+        } else if (typeof raw === 'string') {
+          const url = this.api.resolveMediaUrl({ url: raw });
+          this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), backgroundImage: url };
+        }
+      }
+    }, error: () => console.warn('[home] hero_background missing') });
 
-    this.contentService.getServices().subscribe(services => {
-      this.services = services;
-    });
+    this.api.getContent('home','hero_cta_primary').subscribe({ next: (i) => {
+      const v = i?.content || '';
+      this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), ctaPrimary: v };
+    }, error: () => console.warn('[home] hero_cta_primary missing') });
+    this.api.getContent('home','hero_cta_secondary').subscribe({ next: (i) => {
+      const v = i?.content || '';
+      this.heroContent = { ...(this.heroContent || { headline: '', subheadline: '', ctaPrimary: '', ctaSecondary: '', backgroundImage: '' }), ctaSecondary: v };
+    }, error: () => console.warn('[home] hero_cta_secondary missing') });
+    this.api.getContent('home','hero_badge').subscribe({ next: (i) => this.heroBadge = i?.content || '', error: () => {} });
+    this.api.getContent('home','hero_stats').subscribe({ next: (i) => { try { const arr = JSON.parse(i?.content || '[]'); this.heroStats = Array.isArray(arr) ? arr : []; } catch { this.heroStats = []; } }, error: () => {} });
 
-    this.contentService.getTestimonials().subscribe(testimonials => {
-      this.testimonials = testimonials;
-    });
+    this.api.getServices().subscribe({ next: (list) => {
+      this.services = (list || []).map((s: any) => ({
+        id: String(s.id ?? s.slug ?? ''),
+        title: String(s.name ?? ''),
+        description: String(s.description ?? ''),
+        category: 'permis-b',
+        icon: String(s.icon ?? 'car'),
+        features: [],
+        price: s.price ? `${s.price}€` : undefined,
+        duration: s.duration || undefined,
+        image_media_id: s.image_media_id ?? undefined,
+        image_url: s.image_url ?? undefined
+      }));
+    }, error: () => console.warn('[home] services missing') });
 
-    this.contentService.getWhyChooseUs().subscribe(items => {
-      this.whyChooseUsItems = items;
-    });
+    this.api.getContent('testimonials','list').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        this.testimonials = Array.isArray(arr) ? arr : [];
+      } catch { this.testimonials = []; }
+    }, error: () => console.warn('[home] testimonials missing') });
 
-    this.contentService.getLearningSteps().subscribe(steps => {
-      this.learningSteps = steps;
-    });
+    this.api.getContent('home','why_choose_us').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        this.whyChooseUsItems = Array.isArray(arr) ? arr : [];
+      } catch { this.whyChooseUsItems = []; }
+    }, error: () => console.warn('[home] why_choose_us missing') });
+    this.api.getContent('home','why_badge').subscribe({ next: (i) => this.whyBadge = i?.content || '', error: () => {} });
+    this.api.getContent('home','why_title').subscribe({ next: (i) => this.whyTitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','why_subtitle').subscribe({ next: (i) => this.whySubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','why_cta_label').subscribe({ next: (i) => this.whyCtaLabel = i?.content || '', error: () => {} });
+
+    this.api.getContent('home','learning_steps').subscribe({ next: (i) => {
+      try {
+        const arr = JSON.parse(i?.content || '[]');
+        this.learningSteps = Array.isArray(arr) ? arr : [];
+      } catch { this.learningSteps = []; }
+    }, error: () => console.warn('[home] learning_steps missing') });
+    this.api.getContent('home','services_badge').subscribe({ next: (i) => this.servicesBadge = i?.content || '', error: () => {} });
+    this.api.getContent('home','services_title').subscribe({ next: (i) => this.servicesTitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','services_subtitle').subscribe({ next: (i) => this.servicesSubtitle = i?.content || '', error: () => {} });
+    this.api.getBusinessInfo().subscribe({ next: (info) => this.businessPhone = info?.phone || '', error: () => {} });
+
+    this.api.getContent('home','testimonials_badge').subscribe({ next: (i) => this.testimonialsBadge = i?.content || '', error: () => {} });
+    this.api.getContent('home','testimonials_title').subscribe({ next: (i) => this.testimonialsTitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','testimonials_subtitle').subscribe({ next: (i) => this.testimonialsSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','testimonials_prev_icon').subscribe({ next: (i) => this.testimonialsPrevIcon = i?.content || 'chevron-left', error: () => {} });
+    this.api.getContent('home','testimonials_next_icon').subscribe({ next: (i) => this.testimonialsNextIcon = i?.content || 'chevron-right', error: () => {} });
+
+    this.api.getContent('home','cta_title').subscribe({ next: (i) => this.ctaTitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','cta_subtitle').subscribe({ next: (i) => this.ctaSubtitle = i?.content || '', error: () => {} });
+    this.api.getContent('home','cta_primary_label').subscribe({ next: (i) => this.ctaPrimary = i?.content || '', error: () => {} });
   }
 
   getIconName(icon: string): string {
