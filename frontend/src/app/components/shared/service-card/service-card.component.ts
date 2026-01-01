@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { ApiService } from '../../../services/api.service';
+import { Router } from '@angular/router';
 
 export interface Service {
   id: string;
@@ -19,7 +20,7 @@ export interface Service {
   standalone: true,
   imports: [CommonModule, LucideAngularModule],
   template: `
-    <div class="service-card card-modern group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+    <div class="service-card card-modern group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-2xl" (click)="openContact()">
       <div class="service-header relative overflow-hidden">
         <div class="service-image-wrapper" *ngIf="imageUrl">
           <img 
@@ -67,7 +68,7 @@ export interface Service {
             </div>
           </div>
           
-          <button class="service-cta btn-primary px-6 py-2 text-sm font-semibold" *ngIf="ctaLabel">
+          <button type="button" class="service-cta btn-primary px-6 py-2 text-sm font-semibold" *ngIf="ctaLabel" (click)="openContact($event)">
             {{ ctaLabel }}
             <lucide-icon name="chevron-right" class="w-4 h-4 ml-2"></lucide-icon>
           </button>
@@ -170,7 +171,12 @@ export class ServiceCardComponent {
   badgeLabel = '';
   badgeIcon = '';
 
-  constructor(public api: ApiService) {}
+  constructor(public api: ApiService, private router: Router) {}
+
+  openContact(event?: Event) {
+    event?.stopPropagation();
+    this.router.navigate(['/contact'], { queryParams: { service: this.service?.title || '' } });
+  }
 
   getIconName(): string {
     const iconMap: Record<string, string> = {

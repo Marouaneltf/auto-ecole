@@ -81,7 +81,7 @@ import { Service as FrontService } from '../../models/content.models';
         <h2 class="cta-title" *ngIf="ctaTitle">{{ ctaTitle }}</h2>
         <p class="cta-subtitle" *ngIf="ctaSubtitle">{{ ctaSubtitle }}</p>
         <div class="cta-actions">
-          <button class="btn-secondary" *ngIf="businessPhone">
+          <button type="button" class="btn-secondary" *ngIf="businessPhone" (click)="callPhone(businessPhone)">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
             {{ businessPhone }}
           </button>
@@ -288,5 +288,11 @@ export class ServicesComponent implements OnInit {
     this.api.getContent('services','cta_subtitle').subscribe({ next: (i) => this.ctaSubtitle = i?.content || '', error: () => {} });
     this.api.getContent('services','cta_label').subscribe({ next: (i) => this.ctaLabel = i?.content || '', error: () => {} });
     this.api.getBusinessInfo().subscribe({ next: (info) => this.businessPhone = info?.phone || '', error: () => {} });
+  }
+
+  callPhone(phone: string) {
+    const cleaned = (phone || '').trim();
+    if (!cleaned) return;
+    window.location.href = `tel:${cleaned}`;
   }
 }

@@ -126,7 +126,7 @@ import { AboutContent } from '../../models/content.models';
             {{ ctaPrimaryLabel }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
-          <button class="btn-secondary" *ngIf="businessPhone">
+          <button type="button" class="btn-secondary" *ngIf="businessPhone" (click)="callPhone(businessPhone)">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
             {{ businessPhone }}
           </button>
@@ -443,5 +443,11 @@ export class AboutComponent implements OnInit {
     this.api.getContent('about','cta_subtitle').subscribe({ next: (i) => this.ctaSubtitle = i?.content || '', error: () => {} });
     this.api.getContent('about','cta_primary_label').subscribe({ next: (i) => this.ctaPrimaryLabel = i?.content || '', error: () => {} });
     this.api.getBusinessInfo().subscribe({ next: (info) => this.businessPhone = info?.phone || '', error: () => {} });
+  }
+
+  callPhone(phone: string) {
+    const cleaned = (phone || '').trim();
+    if (!cleaned) return;
+    window.location.href = `tel:${cleaned}`;
   }
 }

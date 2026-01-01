@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -40,9 +41,11 @@ import { ApiService } from '../../services/api.service';
 export class LegalComponent implements OnInit {
   title = 'Mentions Légales';
   contentHtml = '';
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private route: ActivatedRoute) {}
   ngOnInit(): void {
-    this.api.getContent('legal','title').subscribe({ next: (i) => this.title = i?.content || this.title, error: () => {} });
-    this.api.getContent('legal','content_html').subscribe({ next: (i) => this.contentHtml = i?.content || '', error: () => {} });
+    const pageName = this.route.snapshot.routeConfig?.path === 'privacy' ? 'privacy' : 'legal';
+    this.title = pageName === 'privacy' ? 'Politique de confidentialité' : 'Mentions Légales';
+    this.api.getContent(pageName, 'title').subscribe({ next: (i) => this.title = i?.content || this.title, error: () => {} });
+    this.api.getContent(pageName, 'content_html').subscribe({ next: (i) => this.contentHtml = i?.content || '', error: () => {} });
   }
 }

@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { LucideAngularModule, MapPin, Phone, Mail, Clock, ChevronRight, User, MessageCircle } from 'lucide-angular';
 import { ContentService } from '../../services/content.service';
 import { ButtonComponent } from '../../components/ui/button/button.component';
 import { ContactInfo } from '../../models/content.models';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-contact',
@@ -326,11 +328,15 @@ export class ContactComponent implements OnInit {
   contactInfo: ContactInfo | null = null;
   isSubmitting = false;
   submitSuccess = false;
-  mapUrl = '';
+  submitError = false;
+  mapUrl: SafeResourceUrl = '';
 
   constructor(
     private fb: FormBuilder,
-    private contentService: ContentService
+    private contentService: ContentService,
+    private route: ActivatedRoute,
+    private api: ApiService,
+    private sanitizer: DomSanitizer
   ) {
     this.contactForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
@@ -347,7 +353,25 @@ export class ContactComponent implements OnInit {
     });
     // Map URL from Content
     // Expect text or URL string stored at page 'contact', section 'map_url'
-    (this.contentService as any).api.getContent('contact','map_url').subscribe({ next: (i: any) => this.mapUrl = i?.content || '', error: () => {} });
+    this.api.getContent('contact', 'map_url').subscribe({ 
+      next: (i: any) => {
+        const url = i?.content || '';
+        this.mapUrl = url ? this.sanitizer.bypassSecurityTrustResourceUrl(url) : '';
+      }, 
+      error: () => {} 
+    });
+
+    this.route.queryParamMap.subscribe((params) => {
+      const service = (params.get('service') || '').trim();
+      if (!service) return;
+
+      if (!this.contactForm.get('subject')?.value) {
+        this.contactForm.patchValue({ subject: `Informations — ${service}` }, { emitEvent: false });
+      }
+      if (!this.contactForm.get('message')?.value) {
+        this.contactForm.patchValue({ message: `Bonjour, je souhaite obtenir des informations sur : ${service}.` }, { emitEvent: false });
+      }
+    });
   }
 
   onSubmit() {
@@ -357,17 +381,22 @@ export class ContactComponent implements OnInit {
     }
 
     this.isSubmitting = true;
-    
-    // Simulate API call
-    setTimeout(() => {
-      this.isSubmitting = false;
-      this.submitSuccess = true;
-      this.contactForm.reset();
-      
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        this.submitSuccess = false;
-      }, 5000);
-    }, 2000);
+    this.submitError = false;
+    this.submitSuccess = false;
+
+    this.api.submitContact(this.contactForm.value).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.submitSuccess = true;
+        this.contactForm.reset();
+        setTimeout(() => {
+          this.submitSuccess = false;
+        }, 5000);
+      },
+      error: () => {
+        this.isSubmitting = false;
+        this.submitError = true;
+      }
+    });
   }
 }

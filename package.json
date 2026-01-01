@@ -1,4 +1,18 @@
 {
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "postinstall": "npm run install:all",
+    "dev": "node -e \"const {spawn}=require('child_process'); const opts={stdio:'inherit',shell:true}; const procs=[spawn('npm --prefix backend run dev',opts),spawn('npm --prefix frontend run start',opts)]; let exiting=false; const shutdown=(code)=>{ if(exiting) return; exiting=true; for(const p of procs){ try{ p.kill('SIGINT'); }catch{} } process.exit(code||0); }; for(const p of procs){ p.on('exit',(code)=>shutdown(code)); p.on('error',()=>shutdown(1)); } process.on('SIGINT',()=>shutdown(0));\"",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "start": "npm --prefix backend run start",
+    "seed": "npm --prefix backend run seed",
+    "seed:missing": "npm --prefix backend run seed:missing",
+    "db:create": "npm --prefix backend run db:create",
+    "frontend:start": "npm --prefix frontend run start",
+    "frontend:build": "npm --prefix frontend run build",
+    "backend:dev": "npm --prefix backend run dev",
+    "backend:build": "npm --prefix backend run build"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

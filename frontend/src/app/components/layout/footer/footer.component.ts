@@ -67,7 +67,9 @@ import { ApiService } from '../../../services/api.service';
             <div class="footer-section">
               <h4 class="footer-section-title">Nos services</h4>
               <ul class="footer-services-list">
-                <li class="footer-service-item" *ngFor="let s of services">{{ s.title }}</li>
+                <li class="footer-service-item" *ngFor="let s of services">
+                  <a routerLink="/services" class="footer-service-link">{{ s.name }}</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -169,8 +171,14 @@ import { ApiService } from '../../../services/api.service';
     }
     
     .footer-service-item {
-      @apply text-gray-300 text-sm;
+      @apply text-sm;
       padding: 0.25rem 0;
+    }
+
+    .footer-service-link {
+      @apply text-gray-300 hover:text-accent-500 transition-colors duration-200;
+      text-decoration: none;
+      display: block;
     }
     
     .footer-bottom {

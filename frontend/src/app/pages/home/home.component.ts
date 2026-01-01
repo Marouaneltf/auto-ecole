@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { 
   LucideAngularModule, 
   Car, 
@@ -88,11 +88,11 @@ import {
         </div>
         
         <div class="hero-actions flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style="animation-delay: 0.6s">
-          <button class="btn-primary hero-cta text-lg px-8 py-4">
+          <button type="button" class="btn-primary hero-cta text-lg px-8 py-4" (click)="goToContact()">
             {{ heroContent?.ctaPrimary }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
-          <button class="btn-secondary hero-cta-secondary text-lg px-8 py-4">
+          <button type="button" class="btn-secondary hero-cta-secondary text-lg px-8 py-4" (click)="goToServices()">
             {{ heroContent?.ctaSecondary }}
           </button>
         </div>
@@ -146,7 +146,7 @@ import {
         </div>
         
         <div class="text-center mt-16" *ngIf="whyCtaLabel">
-          <button class="btn-primary">
+          <button type="button" class="btn-primary" (click)="goToServices()">
             {{ whyCtaLabel }}
             <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
           </button>
@@ -183,7 +183,7 @@ import {
               Voir tous nos services
               <lucide-icon name="chevron-right" class="ml-2"></lucide-icon>
             </button>
-            <button class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone">
+            <button type="button" class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone" (click)="callPhone(businessPhone)">
               <lucide-icon name="phone" class="mr-2"></lucide-icon>
               {{ businessPhone }}
             </button>
@@ -232,27 +232,29 @@ import {
         </div>
         
         <div class="testimonials-container relative">
-          <div class="testimonials-wrapper flex transition-transform duration-500 ease-in-out" [style.transform]="'translateX(' + (-currentTestimonialIndex * 100) + '%)'">
-            <div 
-              *ngFor="let testimonial of testimonials; let i = index" 
-              class="testimonial-slide w-full flex-shrink-0 px-4">
-              <app-testimonial-card 
-                [testimonial]="testimonial"
-                class="testimonial-item">
-              </app-testimonial-card>
+          <div class="testimonials-viewport">
+            <div class="testimonials-wrapper flex transition-transform duration-500 ease-in-out" [style.transform]="'translateX(' + (-currentTestimonialIndex * 100) + '%)'">
+              <div 
+                *ngFor="let testimonial of testimonials; let i = index" 
+                class="testimonial-slide w-full flex-shrink-0 px-4">
+                <app-testimonial-card 
+                  [testimonial]="testimonial"
+                  class="testimonial-item">
+                </app-testimonial-card>
+              </div>
             </div>
           </div>
           
           <!-- Carousel Controls -->
           <button 
             (click)="previousTestimonial()" 
-            class="testimonial-nav testimonial-nav-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
+            class="testimonial-nav testimonial-nav-prev absolute left-0 top-1/2 transform -translate-y-1/2 z-30">
             <lucide-icon [name]="testimonialsPrevIcon" class="w-6 h-6" *ngIf="testimonialsPrevIcon"></lucide-icon>
           </button>
           
           <button 
             (click)="nextTestimonial()" 
-            class="testimonial-nav testimonial-nav-next absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+            class="testimonial-nav testimonial-nav-next absolute right-0 top-1/2 transform -translate-y-1/2 z-30">
             <lucide-icon [name]="testimonialsNextIcon" class="w-6 h-6" *ngIf="testimonialsNextIcon"></lucide-icon>
           </button>
           
@@ -275,7 +277,7 @@ import {
         <h2 class="cta-title text-3xl md:text-4xl font-bold mb-4">{{ ctaTitle }}</h2>
         <p class="cta-subtitle text-xl mb-8 max-w-2xl mx-auto">{{ ctaSubtitle }}</p>
         <div class="cta-actions flex flex-col sm:flex-row gap-4 justify-center">
-          <button class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone">
+          <button type="button" class="btn-secondary text-lg px-8 py-4" *ngIf="businessPhone" (click)="callPhone(businessPhone)">
             <lucide-icon name="phone" class="mr-2"></lucide-icon>
             {{ businessPhone }}
           </button>
@@ -501,7 +503,11 @@ import {
     }
     
     .testimonials-container {
-      @apply relative overflow-hidden max-w-5xl mx-auto px-4;
+      @apply relative max-w-5xl mx-auto px-4;
+    }
+
+    .testimonials-viewport {
+      @apply overflow-hidden;
     }
     
     .testimonials-wrapper {
@@ -645,7 +651,7 @@ export class HomeComponent implements OnInit {
   ctaSubtitle = '';
   ctaPrimary = '';
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService, private router: Router) {}
 
   ngOnInit() {
     this.loadContent();
@@ -791,8 +797,21 @@ export class HomeComponent implements OnInit {
     }, 5000);
   }
 
+  goToContact() {
+    this.router.navigate(['/contact']);
+  }
+
+  goToServices() {
+    this.router.navigate(['/services']);
+  }
+
+  callPhone(phone: string) {
+    const cleaned = (phone || '').trim();
+    if (!cleaned) return;
+    window.location.href = `tel:${cleaned}`;
+  }
+
   onContactFormSubmit(formData: any) {
-    console.log('Contact form submitted:', formData);
-    // Here you would typically send the data to your API
+    this.api.submitContact(formData).subscribe({ next: () => {}, error: () => {} });
   }
 }
