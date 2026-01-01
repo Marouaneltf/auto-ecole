@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = '/api'; // Use relative path for production (Vercel proxies /api)
+  // private apiUrl = 'http://localhost:3000/api'; // For local dev without proxy (if needed)
 
   constructor(private http: HttpClient) {}
 
